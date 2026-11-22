@@ -1,6 +1,6 @@
 # PHASE 2 – Business Analysis
 
-**Trạng thái:** Đã xác nhận ngày 2026-11-22. **Cập nhật v2 theo CR-001** (chỉ tiếng Đức). Chờ xác nhận Q-CR1-01..02 ([08-decision-log §9](../phase-1/08-decision-log.md)), sau đó sang Phase 3.
+**Trạng thái:** Đã xác nhận ngày 2026-11-22. **Cập nhật v2 theo CR-001** (chỉ tiếng Đức). Q-CR1-01..02 đã xác nhận. Phase 3 đã xong. **Bổ sung theo CR-002:** xem [06-cr002-addendum.md](06-cr002-addendum.md).
 **Phạm vi:** MVP = **German A1 + Info Hub** (PD-08, theo [CR-001](../change-requests/CR-001-german-first.md)). Không có code.
 
 | File | Nội dung |

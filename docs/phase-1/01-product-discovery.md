@@ -121,6 +121,16 @@ Thiết kế theo **Modular Monolith**. Các module dùng chung tài khoản và
 | 12 | Báo lỗi nội dung | Bù cho việc không có người duyệt chuyên môn |
 | 13 | Admin dashboard | |
 | 14 | CMS + quy trình duyệt + import CSV/JSON + AI viết nháp | |
+| 15 | **"Bàn học"**: màn hình chính một cửa (streak, 3 nhiệm vụ ngày, "Tiếp tục học", "Ôn hôm nay", lưới lối vào) | CR-002 A1 |
+| 16 | **Streak + XP + 3 nhiệm vụ ngày** | CR-002 A2 |
+| 17 | **Flashcard + SRS** (SM-2 giản lược) cho từ vựng | CR-002 A3 |
+| 18 | **Khách vào học ngay**: ngữ pháp công khai, luyện tập thử, tiến độ tạm lưu trên máy rồi gộp khi đăng ký | CR-002 A4 |
+| 19 | **Mini-game "Nối từ nhanh"** | CR-002 A5 |
+| 20 | **PWA** (cài lên điện thoại) | CR-002 A6 |
+| 21 | **6 chế độ học từ + "Trộn"** (Lặp lại, Flashcard, Trắc nghiệm, Trắc nghiệm đảo, Đoán, Artikel), chung một lịch SRS | CR-003 A1 |
+| 22 | **Thẻ từ giàu thông tin**: đồng nghĩa, cụm đi kèm, họ từ, cách dùng, kèm nguồn và nhãn AI | CR-003 A2, A6 |
+| 23 | **Cài đặt cá nhân hóa**: mục tiêu XP, thẻ mới/ngày, thời lượng học, độ nghiêm khi chấm | CR-003 A3 |
+| 24 | **Lưu từ + "Từ của tôi"** (tự nhập, không AI), phím tắt | CR-003 A4, A5 |
 
 **Vai trò MVP:** Guest, Student, Admin (kiêm Content Manager).
 
@@ -138,13 +148,27 @@ Thiết kế theo **Modular Monolith**. Các module dùng chung tài khoản và
 | Tính năng | Phiên bản | Giá trị | Độ phức tạp | Chi phí vận hành | Nhận xét |
 |---|---|---|---|---|---|
 | **A2** | 1.1 | Rất cao | Thấp (code) / Cao (nội dung) | 0 | Dùng lại toàn bộ hệ thống |
-| Flashcards + Spaced Repetition (FSRS) | V2 | Rất cao | Trung bình | 0 | Rất hợp với học giống danh từ và chia động từ |
+| ~~Flashcards + Spaced Repetition~~ | ~~V2~~ **MVP (CR-002)** | Rất cao | Trung bình | 0 | Chuyển lên MVP, dùng SM-2 giản lược. FSRS để V2 sau khi xác minh giấy phép |
 | **B1** | V2 | Rất cao (mục tiêu visa Ausbildung) | Cao (nội dung, có Schreiben/Sprechen) | Thấp | |
 | Tiếng Đức cho Ausbildung (phỏng vấn, giới thiệu bản thân, từ vựng nghề) | V2 | Cao | Trung bình | 0 | Khác biệt so với app đại trà |
 | Phản hồi Schreiben bằng AI | V2 | Cao | Trung bình | Token LLM | Ghi rõ là "phản hồi tham khảo". Có quota |
-| Streak, nhắc học qua email | V2 | Trung bình | Thấp | Thấp | |
+| ~~Streak~~ | ~~V2~~ **MVP (CR-002)** | Cao | Thấp | 0 | Chuyển lên MVP cùng 3 nhiệm vụ ngày. Nhắc học qua email vẫn để V2 |
 | Speaking: ghi âm và tự nghe lại | V2 | Trung bình | Thấp | 0 | |
 | Pronunciation feedback (Azure) | V3 | Cao | Cao | Tính theo giờ | Thử free tier trước |
 | B2 | V3 | Trung bình | Cao | 0 | |
 | AI Tutor / hội thoại | V3 | Cao | Trung bình | Biến đổi | Có quota |
 | Payment / Premium | V3 | Phụ thuộc mô hình | Cao | Phí cổng thanh toán | Chỉ làm khi đã có người dùng |
+
+### Bổ sung theo CR-002 (đã chốt, phương án 2)
+| Tính năng | Phiên bản | Ghi chú |
+|---|---|---|
+| Lộ trình trực quan theo tuần/mốc, cụm từ mỗi ngày, mini-game Artikel Blitz, cụm bài SEO `StudyTips`, bộ từ theo nghề (3 nghề), trang hướng dẫn lịch thi | **1.1** (cùng A2) | CR-002 tầng B |
+| Chép chính tả bằng audio TTS của ta, shadowing ghi âm, đọc song ngữ truyện cổ, bảng xếp hạng tuần (tự nguyện), đổi giao diện/ảnh nền, Pomodoro, Ctrl+K, tour, tường góp ý | **V2** | CR-002 tầng C |
+| Đấu trường realtime, cửa hàng kim cương, "Đơn đang mở" (qua API chính thức), "La bàn nghề" | **V3** hoặc không làm | CR-002 tầng D |
+
+### Bổ sung theo CR-003 (đã chốt, phương án 2)
+| Tính năng | Phiên bản |
+|---|---|
+| Bộ từ theo nghề (Bộ → Phần → Chủ đề con, 3 nghề), trang Thống kê (heatmap, 14 ngày), hội thoại chat điền chỗ trống, dịch Việt → Đức che chữ, tạm nghỉ chuỗi, "Có gì mới" | **1.1** |
+| "Từ của tôi" có AI (cần sửa BR-PRIV-03), chép chính tả bằng audio TTS, đọc song ngữ, luyện nói ghi âm, viết có AI nhận xét, bảng xếp hạng | **V2** |
+| Quán café 3D, cửa hàng hình nền/khung, thư viện video bên thứ ba | **V3 hoặc không làm** |

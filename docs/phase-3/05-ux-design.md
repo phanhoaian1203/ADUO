@@ -259,3 +259,14 @@ Publish hàng loạt **chỉ áp dụng cho mục không có cờ cảnh báo**.
 - Điều khiển được bằng bàn phím: phím 1–4 chọn đáp án, Enter để tiếp tục (desktop).
 - Đồng hồ bài kiểm tra dùng `aria-live="polite"` mỗi phút, và đọc thông báo khi còn 5 phút.
 - Tôn trọng cài đặt `prefers-reduced-motion`.
+
+## 6. [ĐÃ CHỐT – CR-002, phương án 2] Điều chỉnh UX sau khảo sát đối thủ
+
+> Đã chốt ngày 2026-11-22. Phân tích: [docs/research/01-competitor-analysis.md](../research/01-competitor-analysis.md).
+
+- **Dashboard → "Bàn học":** màn hình chính một cửa, có streak, 3 nhiệm vụ, nút "Tiếp tục học", thẻ "Ôn hôm nay", lưới lối vào. Wireframe: [08-engagement §5](../phase-4/modules/08-engagement.md).
+- **Thanh điều hướng dưới (mobile) 5 mục** thay vì 4: Học · Từ vựng · Ôn tập · Thông tin · Tôi. "Kiểm tra" vào từ "Học". Trên mobile nên là thanh nổi dạng viên thuốc, một tay chạm được, như Brottin.
+- **Khách vào học ngay:** landing có khung "Chơi thử ngay" (mini-game Nối từ) và nút "Học thử bài đầu tiên". Ngữ pháp công khai. Tiến độ khách lưu trên máy kèm lời mời đăng nhập để giữ trên mọi thiết bị.
+- **Trang ngữ pháp:** hai tab "Xem kiến thức" / "Luyện tập", thanh bên có tìm kiếm + lọc cấp độ trên desktop.
+- **Hình ảnh:** nền gradient + hình minh họa vector tự thiết kế (địa danh Đức dạng đơn giản). **Không** dùng ảnh nền phong cách hãng phim hay mascot không có giấy phép.
+- **Giọng văn:** giữ thân thiện, có một chút "tình cảm" (ví dụ lời chào theo giờ trong ngày, thông điệp nhẹ nhàng khi streak dừng), nhưng không trẻ con hóa.

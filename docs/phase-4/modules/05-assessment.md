@@ -287,3 +287,19 @@ sequenceDiagram
 - [ ] AS-T01..37 pass. Độ phủ test của Grading và `ExamAttempt` ≥ 90%.
 - [ ] Làm trọn một đề trên điện thoại thật, có bật và tắt mạng giữa chừng.
 - [ ] Không endpoint nào trả đáp án trước khi nộp (có test tự động quét JSON response).
+
+## 10. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Đã chốt ngày 2026-11-22 (CR-002, phương án 2). Đây là kế hoạch chính thức.
+
+- **Mini-game dùng lại component câu hỏi:** `MatchingQuestion` (chạm-chạm) và `SingleChoiceQuestion` được tách thành component không phụ thuộc vào chế độ luyện tập hay kiểm tra, để Engagement dùng lại.
+- **Luyện tập công khai chấm ở phía khách (A4):** một số bộ câu hỏi đánh dấu `is_public_practice` được trả **kèm đáp án** cho khách, để chơi thử ngay không cần đăng nhập. Bộ này **tách riêng** khỏi ngân hàng đề kiểm tra, để không lộ đáp án bài có giờ. Bài kiểm tra cuối cấp **không bao giờ** chấm ở client.
+- `answer_events.source` thêm giá trị `Game` và `Srs`.
+- **Sinh nhiều đề từ một ngân hàng:** để có nhiều bài kiểm tra mà không cần soạn tay từng đề, ưu tiên loại đề `Generated` (đã có trong thiết kế). Đây là cách giữ khối lượng nội dung hợp lý so với kho đề lớn của đối thủ (mà họ lấy từ nhà xuất bản, ta không làm).
+- Test bổ sung: **AS-T38** endpoint công khai không bao giờ trả câu hỏi thuộc ngân hàng đề kiểm tra.
+
+## 11. [ĐÃ CHỐT – CR-003, phương án 2] Tái dùng cho học từ và độ nghiêm khi chấm
+
+- **Component dùng chung:** `SingleChoiceQuestion` và `FillBlankQuestion` nhận prop `mode` (`practice`, `exam`, `srs`) và **không phụ thuộc** vào API câu hỏi, để Engagement dựng thẻ ôn từ dữ liệu Lexicon mà không cần tạo `Question` thật.
+- **Độ nghiêm khi chấm** (`grading_strictness` của người dùng, xem [08-engagement §12.2](08-engagement.md)): `IAnswerGrader` nhận thêm `GradingStrictness` và **chỉ** dùng ở `GradingMode.Practice`. Ở `GradingMode.Exam` luôn dùng cấu hình của câu hỏi (BR-EXAM giữ nguyên).
+- **"Gần đúng":** kết quả chấm có thêm cờ `IsNearMiss` (sai 1 ký tự với từ dài từ 6 ký tự), chỉ ở strictness Easy.
+- **Test bổ sung:** **AS-T39** strictness Easy chấp nhận `ae/oe/ue/ss`. **AS-T40** ở `GradingMode.Exam` strictness bị bỏ qua. **AS-T41** `IsNearMiss` đúng ngưỡng 6 ký tự.

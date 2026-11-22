@@ -237,3 +237,38 @@ anrufen,Verb,,,,ˈanˌʁuːfn̩,true,true,A1,gọi điện,giao-tiep,wiktionary:
 ```
 - Bảng chia động từ không đi qua CSV (khó biểu diễn). Có hai cách: import JSON, hoặc để CLI lấy tự động từ dữ liệu Wiktionary.
 - Template JSON được mô tả bằng JSON Schema, tải về tại `/admin/imports/templates/{contentType}?format=json`.
+
+## 10. [ĐÃ CHỐT – CR-002] API module Engagement và phần công khai
+
+Chi tiết nghiệp vụ: [08-engagement.md §7](../phase-4/modules/08-engagement.md).
+
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/me/engagement/today` | Auth | Streak, 3 nhiệm vụ kèm tiến độ, XP hôm nay, cấp độ |
+| GET | `/me/srs/summary` | Auth | Số thẻ đến hạn, thẻ mới còn được học hôm nay, số thẻ "đã thuộc" |
+| GET | `/me/srs/session?limit=20` | Auth | Bộ thẻ cho một phiên ôn (đã resolve từ Lexicon) |
+| POST | `/me/srs/answers` | Auth | `{entryId, grade, clientEventId, responseMs}`. Idempotent theo `clientEventId` |
+| POST | `/me/srs/cards` | Auth | Thêm thẻ thủ công `{entryId}` |
+| PATCH | `/me/srs/cards/{entryId}` | Auth | `{isSuspended}` |
+| POST | `/me/engagement/merge-guest` | Auth | Gộp dữ liệu khách `{schemaVersion, events[], cards[]}`. Lỗi: 400 `GUEST_PAYLOAD_TOO_LARGE` |
+| GET | `/public/practice/vocabulary-pairs?count=4` | **Public** | Cặp từ cho mini-game của khách. **Có đáp án** vì chỉ để thử |
+| GET | `/public/practice/sets/{slug}` | **Public** | Bộ luyện tập công khai (có đáp án, chấm ở client) |
+| GET | `/public/grammar-points` · `/public/grammar-points/{slug}` | **Public** | Ngữ pháp công khai (SSR đọc qua đây) |
+| GET | `/public/daily-phrase?date=` | **Public** | Cụm từ của ngày (1.1) |
+
+**Quy ước:** tiền tố `/public/` dành cho dữ liệu cho khách **kể cả đáp án**. Mọi endpoint `/public/` phải có test "không bao giờ trả nội dung thuộc ngân hàng đề kiểm tra" (AS-T38, EN-T21) và rate limit riêng 120 request/phút/IP.
+
+Cấu trúc thư mục: thêm `Aduo.Core/Modules/Engagement/` theo mẫu module chuẩn (Domain/SrsScheduler, Features/Srs, Features/Today, Features/MergeGuest, Jobs nếu cần). Frontend: `features/engagement/` (gồm `guestStore.ts`, `components/StreakCard`, `QuestList`, `FlashCard`, `MatchGame`).
+
+## 11. [ĐÃ CHỐT – CR-003, phương án 2] Thiết lập, Lưu từ, Từ của tôi
+
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET, PUT | `/me/preferences` | Auth | Thiết lập cá nhân hóa. Lỗi: 400 `VALIDATION_FAILED` khi ngoài giới hạn |
+| POST | `/me/saved-entries` | Auth | `{entryId}` |
+| DELETE | `/me/saved-entries/{entryId}` | Auth | Bỏ lưu (không xóa thẻ SRS) |
+| GET, POST | `/me/user-words` | Auth | Từ của tôi. Lỗi: 422 `USER_WORD_LIMIT` khi quá 500 |
+| PATCH, DELETE | `/me/user-words/{id}` | Auth (chủ sở hữu) | Sửa, xóa |
+| GET | `/me/srs/session?mode=&limit=` | Auth | Thêm tham số `mode` (`Mixed`, `Review`, `Flashcard`, `ChoiceViVi`, `ChoiceReverse`, `Guess`, `Artikel`) |
+
+DTO công khai của nội dung có thêm cờ `aiAssisted` (bool). Thẻ từ trả thêm `synonyms`, `collocations`, `wordFamily`, `usageNotesVi`.

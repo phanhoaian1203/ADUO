@@ -211,3 +211,33 @@ Bảng nhỏ `lexicon.saved_entries(user_id, entry_id, saved_at)`, có nút ☆ 
 - [ ] Có ≥ 100 từ A1 Published với đủ giống, số nhiều, bảng chia động từ, nghĩa tiếng Việt.
 - [ ] Ghi chú cấu trúc Wiktionary đã được lưu lại.
 - [ ] Ghi công hiển thị đúng trên mọi mục từ được import.
+
+## 10. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Đã chốt ngày 2026-11-22 (CR-002, phương án 2). Đây là kế hoạch chính thức.
+
+- **Ngữ pháp công khai cho khách (A4):** thêm cột `is_public` cho `grammar_points`. Điểm ngữ pháp công khai được **render phía server** (SSR) tại `/ngu-phap/[slug]`, có metadata và JSON-LD để SEO, giống cách Brottin làm. Bố cục một bài nên theo mẫu đã chứng minh hiệu quả: giải thích ngắn → cấu trúc → ví dụ có dịch → bảng tổng hợp → **lỗi thường gặp (cặp sai/đúng + lý do)** → lưu ý sử dụng → bài liên quan → luyện tập ngay.
+- **Bộ chơi thử công khai (A5):** thêm cột `is_public_practice` cho `vocabulary_entries` (khoảng 50 từ A1 chọn tay). Endpoint công khai chỉ đọc từ nhóm này.
+- **Thẻ SRS (A3):** Lexicon cung cấp `ILexiconReader.GetEntriesAsync(ids)` cho Engagement. **Không** lưu gì về người học trong Lexicon.
+- **Cụm từ mỗi ngày (B2, 1.1):** loại nội dung `DailyPhrase` đăng ký với `IContentRegistry`. Nằm trong Engagement (xem 08-engagement §3.5), không nằm ở đây.
+- **Bộ từ theo nghề Ausbildung (B5, 1.1):** thêm bảng `topics` loại `Vocational` (điều dưỡng, nhà hàng–khách sạn, cơ điện tử). Chất lượng chuyên ngành khó duyệt khi làm một mình, nên cần quy trình riêng: chỉ nhập từ có nguồn tham chiếu, AI không tự đặt nghĩa chuyên ngành.
+- Test bổ sung: **LX-T16** điểm ngữ pháp `is_public=false` không xem được khi chưa đăng nhập, **LX-T17** trang ngữ pháp công khai có `<title>`, meta description và JSON-LD.
+
+## 11. [ĐÃ CHỐT – CR-003, phương án 2] Thẻ từ giàu thông tin
+
+> Đã chốt ngày 2026-11-22. Nguồn: [CR-003 A2](../../change-requests/CR-003-personalization-from-brottin.md), [deep dive §3.1](../../research/02-brottin-deep-dive.md).
+
+**Thêm vào `VocabularyEntry`:**
+| Thuộc tính | Kiểu | Nội dung |
+|---|---|---|
+| `Synonyms` | jsonb (mảng `{lemma, noteVi?}`) | Từ đồng nghĩa |
+| `Collocations` | jsonb (mảng `{textDe, textVi}`) | Cụm từ đi kèm (ví dụ "Blutdruck messen") |
+| `WordFamily` | jsonb (mảng `{entryId?, lemma, pos, meaningVi}`) | Họ từ. Nếu từ liên quan đã có trong Lexicon thì lưu `entryId` để chạm vào mở thẻ đó |
+| `UsageNotesVi` | text | Lưu ý cách dùng, lỗi hay gặp, sắc thái (Markdown ngắn) |
+
+**Quy tắc (BR-LEX-05):** thẻ từ hiển thị **nguồn** (Source + License, đã có ở BR-CNT-02) và **nhãn "Có hỗ trợ AI"** khi `Origin` là `AIDraft` hoặc `AIDraftHumanEdited`. Bốn trường mới đều **không bắt buộc**: thiếu thì UI ẩn mục đó, không chặn publish. Chỉ giống, số nhiều (BR-LEX-01) và bảng chia động từ (BR-LEX-02) vẫn bắt buộc.
+
+**Nguồn dữ liệu:** Wiktionary qua `wiktextract` có các trường đồng nghĩa, từ phái sinh, từ liên quan. 🟡 **Chưa kiểm tra trên dữ liệu thật.** Bước khám phá dữ liệu (§8 bước 1) phải trả lời: trường nào có, độ phủ bao nhiêu với danh sách A1. Nếu độ phủ thấp thì dùng AI viết nháp (qua pipeline ContentOps, có nhãn và duyệt). **Không** lấy từ nền tảng khác (CR-003 D1).
+
+**Giao diện thẻ (dùng chung cho tra từ, bài học, phiên ôn):** mạo từ có màu + từ + IPA + audio, rồi nghĩa tiếng Việt, ví dụ có audio, 4 chip mở rộng (Đồng nghĩa, Cụm đi kèm, Họ từ, Cách dùng), mục Lưu ý chỉ hiện khi có. Cuối thẻ: dòng nguồn, nhãn AI, nút "Báo lỗi", nút "Lưu từ".
+
+**Test bổ sung:** **LX-T18** thẻ có `Origin=AIDraftHumanEdited` hiển thị nhãn AI. **LX-T19** thẻ thiếu `Synonyms` vẫn publish được và UI ẩn chip. **LX-T20** chạm vào từ trong `WordFamily` có `entryId` mở đúng thẻ.

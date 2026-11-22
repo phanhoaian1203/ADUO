@@ -129,3 +129,11 @@ Màn hình chúc mừng khi hoàn thành bài, và lớn hơn khi hoàn thành u
 ## 9. Definition of Done
 - [ ] PR-T01..13 pass.
 - [ ] Học thử một unit hoàn chỉnh: % và "Tiếp tục học" đều đúng sau mỗi bài.
+
+## 10. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Đã chốt ngày 2026-11-22 (CR-002, phương án 2). Đây là kế hoạch chính thức.
+
+- **Dashboard được thay bằng "Bàn học" (A1):** `GET /me/dashboard` vẫn có, nhưng giờ gom thêm dữ liệu từ Engagement (streak, nhiệm vụ, số thẻ cần ôn, cấp độ). Wireframe mới ở [08-engagement §5](08-engagement.md). Các khối cũ (Tiếp tục học, Unit hiện tại, Bài kiểm tra gợi ý, Dành cho bạn) giữ nguyên.
+- **Streak không còn nằm ở Progress**, mà do Engagement quản lý. Progress chỉ cung cấp sự kiện hoàn thành bài và bài tập.
+- Progress gọi `IEngagementWriter.OnLessonCompleted` và `OnExerciseDone` để Engagement cập nhật nhiệm vụ (tách thành interface để Progress không phụ thuộc cài đặt).
+- Test bổ sung: **PR-T14** hoàn thành bài thì nhiệm vụ "hoàn thành 1 bài" tăng tiến độ.

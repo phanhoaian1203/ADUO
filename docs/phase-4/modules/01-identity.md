@@ -239,3 +239,17 @@ Guard ở frontend (`(learn)/layout.tsx`):
 - [ ] Google login chạy được ở dev (`http://localhost`, redirect URI đã đăng ký trong Google Cloud Console).
 - [ ] Không có mật khẩu, token hay email trong log (đã kiểm tra bằng cách grep log).
 - [ ] Decision log cập nhật nếu có thay đổi.
+
+## 12. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Chỉ áp dụng nếu CR-002 được chốt (phương án 2 hoặc 1).
+
+- **Gộp dữ liệu khách (A4):** sau khi đăng ký hoặc đăng nhập lần đầu, frontend gọi `POST /me/engagement/merge-guest` (module Engagement) để gộp tiến độ tạm trên `localStorage`. Identity không xử lý gộp, chỉ bảo đảm người dùng vừa đăng nhập xong có phiên hợp lệ.
+- **Onboarding** thêm một bước ngắn (tùy chọn): "Mỗi ngày bạn muốn học bao lâu? 5 / 10 / 15 phút", để chọn số thẻ mới mỗi ngày và độ khó nhiệm vụ.
+- `IUserDataEraser` của Engagement phải được gọi khi xóa tài khoản (BR-ENG-09).
+- Test bổ sung: **ID-T21** khách chơi, đăng ký, dữ liệu được gộp đúng, **ID-T22** `returnUrl` sau đăng ký từ trang chơi thử quay về đúng trang.
+
+## 13. [ĐÃ CHỐT – CR-003, phương án 2] Onboarding cá nhân hóa
+
+- Onboarding (US-05) thêm **bước 3 tùy chọn**: "Mỗi ngày bạn muốn học bao lâu?" 5 / 10 / 15 / 20 phút. Giá trị lưu vào `engagement.user_preferences.daily_minutes` (module Engagement, không phải Identity) và quyết định số thẻ mới mỗi ngày gợi ý (5 phút = 5 thẻ, 10 = 10, 15 = 15, 20 = 20).
+- Trang **Cài đặt** nằm trong Hồ sơ, gọi `/me/preferences` (xem [08-engagement §12.5](08-engagement.md)).
+- Test bổ sung: **ID-T23** bỏ qua bước 3 thì dùng mặc định 10 phút.

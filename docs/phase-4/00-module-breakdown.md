@@ -209,3 +209,32 @@ Mỗi tài liệu gồm: mục tiêu và phạm vi, **kiến thức lập trình
 - `lexicon.vocabulary_entries.gloss_en`.
 - `lexicon.saved_entries` (Should).
 - `progress.lesson_progress.reached_end`.
+
+## 6. [ĐÃ CHỐT – CR-002, phương án 2] Module 8 – Engagement và thứ tự triển khai mới
+
+> Đã chốt ngày 2026-11-22 ([chi tiết](../change-requests/CR-002-competitive-insights.md)). **Mục 6 này thay thế thứ tự và ước tính ở các mục 1–5** (các mô tả module 0–7 vẫn đúng).
+
+| # | Module | Mô tả | Schema | Số bảng | Ước tính (ngày công) |
+|---|---|---|---|---|---|
+| 8 | **Engagement** | Ôn thẻ SRS, streak, XP, nhiệm vụ ngày, mini-game, gộp dữ liệu khách, cụm từ mỗi ngày (1.1) (+ chế độ học từ, cài đặt cá nhân hóa, Từ của tôi theo CR-003) | `engagement` | 9 | 22–28 (tầng A của CR-002 và CR-003) |
+
+Chi tiết: [modules/08-engagement.md](modules/08-engagement.md). Các module 1, 3, 4, 5, 6, 7 có mục **"[ĐÃ CHỐT – CR-002]"** ở cuối tài liệu của chúng.
+
+**Thứ tự triển khai (chính thức):**
+
+| Bước | Module |
+|---|---|
+| 1 | Foundation (**xong**) |
+| 2 | Identity |
+| 3 | ContentOps 2a (lõi) |
+| 4 | Lexicon (+ ngữ pháp công khai, bộ chơi thử) |
+| 5 | Catalog |
+| 6 | Assessment 5a (+ component câu hỏi dùng chung) |
+| 7 | Progress |
+| 8 | **Engagement** (SRS, streak, nhiệm vụ, mini-game, "Bàn học", PWA) |
+| 9 | Assessment 5b |
+| 10 | InfoHub |
+| 11 | ContentOps 2b |
+
+**Tổng ước tính code MVP: khoảng 88–119 ngày công** (56–78 ban đầu, 76–105 sau CR-002, 88–119 sau CR-003). Lexicon tăng 3–4 ngày (thẻ giàu thông tin), ContentOps tăng 1 ngày (nhãn AI), Engagement tăng 8–9 ngày. **Giữ điểm kiểm tra:** sau Identity + ContentOps 2a + Lexicon, đo tốc độ thực rồi quyết định giữ hay hoãn các tầng A (CR-002, CR-003).
+Ước tính thô, sẽ chỉnh sau khi đo tốc độ thực ở module Identity.

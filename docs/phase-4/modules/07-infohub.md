@@ -112,3 +112,12 @@ Tìm bài Published có `review_due_at < today`, chuyển sang `NeedsUpdate` qua
 ## 9. Definition of Done
 - [ ] IH-T01..09 pass. Lighthouse SEO ≥ 90 cho trang bài viết (NFR-14).
 - [ ] ≥ 5 bài Published, mỗi bài có nguồn chính thức đã được mở lại trong tuần.
+
+## 10. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Đã chốt ngày 2026-11-22 (CR-002, phương án 2). Đây là kế hoạch chính thức.
+
+- **Chuyên mục mới `StudyTips` (B4, Release 1.1):** cụm bài SEO theo mẫu "tiêu đề dạng câu hỏi → quy tắc → ngoại lệ → bảng từ người Việt hay nhầm → FAQ → nút vào bài tập". Ví dụ: "Cách nhớ der/die/das theo đuôi từ", "Goethe, telc, ÖSD khác nhau thế nào". Bài do ta tự viết, không chép của ai. Chuyên mục này **không** cần nguồn chính thức bắt buộc (BR-INFO-01 chỉ áp dụng cho Ausbildung, Recognition, LearningPath), nhưng nếu nhắc tới quy định thi thì vẫn phải dẫn nguồn.
+- **Trang hướng dẫn lịch thi (B6, 1.1):** **không chép lịch**. Chỉ dẫn cách tra trên cổng chính thức của đơn vị thi, ghi rõ ngày rà soát, và cảnh báo khi quá hạn. Mẫu trung thực này học từ cách Deutsch Tiger trình bày lịch thi Goethe.
+- **Bài học từ TPT Glanz:** dữ liệu có thời hạn mà không tự hết hạn làm mất lòng tin (trang "đơn đang mở" của họ vẫn hiển thị đơn nhập học 09/2026 và 10/2026 khi tôi xem ngày 22/11/2026). Cơ chế `ReviewDueAt` và job `MarkOverdueArticles` của ta giải quyết đúng vấn đề này.
+- **Giữ nguyên BR-INFO-05:** không in lương, chi phí, "để dành được bao nhiêu" khi chưa có nguồn chính thức kèm ngày, dù đối thủ làm.
+- Test bổ sung: **IH-T10** bài `StudyTips` không có nguồn vẫn publish được, **IH-T11** bài nhắc ngày thi mà thiếu nguồn bị chặn.

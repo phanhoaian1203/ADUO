@@ -43,6 +43,7 @@
 ## 4. Những gì tuyệt đối không làm
 - Không scraping hay tải hàng loạt từ: Goethe, telc, DW, DWDS, các app luyện thi.
 - Không nhập đề mẫu (Übungssätze), câu hỏi hay audio của Goethe/telc/DW vào hệ thống khi chưa có văn bản cho phép.
+- **Không dùng dữ liệu của các nền tảng học tiếng Đức khác** (Brottin, TPT Glanz, Deutsch Tiger, …): không import file xuất (CSV/Excel) của họ, không đưa vào repo, không dùng làm mẫu hay dữ liệu huấn luyện cho AI. Ví dụ đã kiểm tra: điều khoản của Brottin (cập nhật 2026-09-22, Điều 6) cho dùng nội dung để **tự học** nhưng cấm sao chép hàng loạt, thu thập tự động và phát hành lại. Ý tưởng, cấu trúc và trải nghiệm thì được học hỏi. Xem [research/02-brottin-deep-dive.md](../research/02-brottin-deep-dive.md).
 - Không nhúng lại audio của Tatoeba hoặc Commons nếu **trường license trống**.
 - Không dùng nội dung CC BY-NC nếu có kế hoạch thu phí.
 - Không ghi "chính thức" cho câu hỏi tự biên soạn. Gắn nhãn *"Bài kiểm tra do nền tảng biên soạn theo khung CEFR, không phải đề thi Goethe hay telc"*.

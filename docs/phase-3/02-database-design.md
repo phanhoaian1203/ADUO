@@ -126,7 +126,7 @@ Mỗi kiểu có một record C# và validator riêng.
 | `entry_examples` | `entry_id`, `sentence_id`, `sort_order` | PK ghép |
 | `grammar_points` 🧾 | `id`, `language_code`, `slug`, `title_vi`, `structure` (ví dụ `Subjekt + Verb (Pos. 2) + …`), `explanation_md`, `common_mistakes_md`, `cefr_level` | UQ `(language_code, slug)` |
 | `grammar_examples` | `grammar_point_id`, `sentence_id`, `sort_order` | PK ghép |
-| `saved_entries` (Should) | `user_id`, `entry_id`, `saved_at` | PK ghép. "Sổ từ của tôi" |
+| ~~`saved_entries`~~ | *(đã chuyển sang schema `engagement`, xem §9 – CR-003)* | |
 
 `forms` (jsonb) chứa hình thái của động từ, phục vụ BR-LEX-02:
 ```json
@@ -242,3 +242,50 @@ Quy mô ước tính: 1.000 người × 2.000 lượt trả lời = 2 triệu d�
 | 2 | Reading (Lesen) | 1500 s (25 phút) | 15 | 1 | null | false |
 
 `pass_bands`: ≥ 60 → `ReadyForNext`, ≥ 40 → `NeedsReview`, còn lại → `Relearn` (BR-EXAM-11).
+
+## 8. [ĐÃ CHỐT – CR-002] Schema `engagement` và cột bổ sung
+
+> Schema thứ 8 (AD-06). **Cần migration mới** khi làm module Engagement: `Init` chỉ tạo 7 schema. Thêm hằng `Schemas.Engagement` và đưa vào `Schemas.All` (test `Migrations_Apply_AndCreateAllModuleSchemas` sẽ tự kiểm tra). Chi tiết cột và lý do: [08-engagement.md §6](../phase-4/modules/08-engagement.md).
+
+### 8.1 Bảng mới
+| Bảng | Cột chính | Ràng buộc / Index |
+|---|---|---|
+| `engagement.srs_cards` | `user_id`, `entry_id` (FK → `lexicon.vocabulary_entries`), `state`, `ease_factor` numeric(4,2), `interval_days`, `repetitions`, `due_at`, `last_reviewed_at`, `lapses`, `total_reviews`, `is_suspended`, `created_at` | PK `(user_id, entry_id)`. IX `(user_id, due_at)` WHERE NOT `is_suspended`. CK `ease_factor >= 1.3` |
+| `engagement.srs_review_log` | `id` bigint, `user_id`, `entry_id`, `grade`, `response_ms`, `reviewed_at`, `client_event_id` uuid | **UQ `(user_id, client_event_id)`** (idempotent). Append-only |
+| `engagement.daily_activity` | `user_id`, `day` date (giờ VN), `xp_earned`, `cards_reviewed`, `exercises_done`, `lessons_completed`, `scenes_played`, `goals_completed` | PK `(user_id, day)` |
+| `engagement.user_stats` | `user_id` PK, `total_xp`, `level`, `current_streak`, `longest_streak`, `last_active_day` | Bản tổng hợp đọc nhanh, tính lại được từ `daily_activity` |
+| `engagement.daily_quests` | `user_id`, `day`, `kind`, `target`, `progress`, `completed_at` | PK `(user_id, day, kind)` |
+| `engagement.daily_phrases` 🧾 (Release 1.1) | `id`, `text_de`, `text_vi`, `kind`, `audio_media_id`, `cefr_level` | Qua ContentOps lifecycle |
+
+### 8.2 Cột bổ sung ở bảng cũ
+| Bảng | Cột | Mục đích |
+|---|---|---|
+| `lexicon.grammar_points` | `is_public` bool mặc định false | Ngữ pháp công khai cho khách (SSR, SEO) |
+| `lexicon.vocabulary_entries` | `is_public_practice` bool mặc định false | Bộ từ chơi thử cho khách (khoảng 50 từ A1) |
+| `assessment.questions` | `is_public_practice` bool mặc định false | Bộ luyện tập công khai, **tách khỏi** ngân hàng đề kiểm tra (AD-07) |
+| `catalog.units` | `week_hint` smallint null, `milestone_label` text null | Trang Lộ trình trực quan (1.1) |
+| `progress.answer_events` | giá trị `source` mới: `Game`, `Srs` | Phân biệt nguồn sự kiện |
+
+**Ràng buộc quan trọng:** câu hỏi đã nằm trong một đề kiểm tra (`exam_questions`) **không được** đặt `is_public_practice = true` (kiểm tra ở ứng dụng khi lưu, vì lộ đáp án bài có giờ).
+
+## 9. [ĐÃ CHỐT – CR-003, phương án 2] Cá nhân hóa và thẻ từ giàu thông tin
+
+### 9.1 Cột mới ở `lexicon.vocabulary_entries`
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| `synonyms` | jsonb null | `[{lemma, noteVi?}]` |
+| `collocations` | jsonb null | `[{textDe, textVi}]` |
+| `word_family` | jsonb null | `[{entryId?, lemma, pos, meaningVi}]` |
+| `usage_notes_vi` | text null | Markdown ngắn |
+
+### 9.2 Bảng mới và thay đổi ở schema `engagement`
+Chi tiết cột và lý do: [08-engagement §12.5](../phase-4/modules/08-engagement.md).
+| Bảng | Thay đổi |
+|---|---|
+| `engagement.user_preferences` | **Mới.** Một dòng mỗi người: `daily_xp_goal`, `new_cards_per_day`, `daily_minutes`, `grading_strictness`, `default_study_mode`, `meaning_language`. CK theo giới hạn BR-ENG-11 |
+| `engagement.saved_entries` | **Mới** (chuyển từ Lexicon). PK `(user_id, entry_id)` |
+| `engagement.user_words` | **Mới.** Từ do người học tự nhập, riêng tư theo `user_id` |
+| `engagement.srs_cards` | **Sửa:** PK thành `id` uuid; thêm `user_word_id` null; CK đúng một trong `entry_id` / `user_word_id`; UQ partial cho từng cặp |
+| `engagement.daily_activity` | **Sửa:** thêm `active_seconds` int |
+
+**Vì sao chuyển `saved_entries` sang Engagement?** Đây là dữ liệu **của từng người học**, không phải tri thức dùng chung. Lexicon chỉ nên chứa nội dung đã duyệt, không biết người học nào lưu gì (AR-03).

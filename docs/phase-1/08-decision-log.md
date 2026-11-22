@@ -9,6 +9,8 @@ Cập nhật: 2026-11-22. Trạng thái dùng trong sổ:
 | Mã | Ngày | Nội dung | Tài liệu |
 |---|---|---|---|
 | CR-001 | 2026-11-22 | **Tập trung 100% vào tiếng Đức** | [CR-001](../change-requests/CR-001-german-first.md) |
+| CR-003 | 2026-11-22 | **[ĐÃ CHỐT – phương án 2]** Kế thừa và cải tiến cá nhân hóa học từ vựng từ phân tích sâu Brottin (chế độ học từ, thẻ giàu thông tin, cài đặt cá nhân hóa, Từ của tôi). Kèm quyết định D1: **không dùng dữ liệu Brottin** | [CR-003](../change-requests/CR-003-personalization-from-brottin.md), [deep dive](../research/02-brottin-deep-dive.md) |
+| CR-002 | 2026-11-22 | **[ĐÃ CHỐT – phương án 2]** Tích hợp bài học từ khảo sát Brottin, TPT Glanz, Deutsch Tiger: thêm module Engagement, "Bàn học", SRS, streak, khách vào học ngay | [CR-002](../change-requests/CR-002-competitive-insights.md), [phân tích](../research/01-competitor-analysis.md) |
 
 ## 1. Câu trả lời của chủ dự án (Phase 1, 2026-11-22)
 
@@ -53,6 +55,9 @@ Rule chi tiết: [phase-2/03-business-rules.md](../phase-2/03-business-rules.md)
 | AD-03 | ETL dữ liệu lớn bằng công cụ CLI .NET, không chạy trong web request | Confirmed |
 | AD-04 | Không gọi API ngoài trong luồng học ở MVP. Audio và bản dịch tạo trước | Confirmed |
 | AD-05 | Giữ thực thể `Language` và `ProgramType` để mở rộng sang ngôn ngữ khác, nhưng **không** xây trước tính năng cho ngôn ngữ khác (YAGNI) | Confirmed |
+| AD-06 | Thêm module **Engagement** (schema `engagement`, schema thứ 8). Cần **migration mới** thêm schema khi làm module này (migration `Init` chỉ tạo 7 schema) và thêm hằng `Schemas.Engagement` trong code | Confirmed (CR-002) |
+| AD-07 | Luyện tập công khai chấm ở client chỉ với bộ câu hỏi `is_public_practice`, tách khỏi ngân hàng đề kiểm tra. Bài kiểm tra cuối cấp luôn chấm ở server | Confirmed (CR-002) |
+| AD-08 | "Ngày học" và streak tính theo múi giờ `Asia/Ho_Chi_Minh`. XP chỉ từ sự kiện server xác nhận | Confirmed (CR-002) |
 
 ## 5. Technology Stack (Confirmed)
 .NET 10 LTS · ASP.NET Core Web API · EF Core · PostgreSQL · ASP.NET Core Identity (+ Google login) · Next.js + TypeScript + Tailwind + shadcn/ui · TanStack Query · React Hook Form + Zod · Cloudflare R2 · Azure TTS (de-DE) · Docker · GitHub Actions · Serilog · Sentry.
@@ -93,6 +98,40 @@ Rule chi tiết: [phase-2/03-business-rules.md](../phase-2/03-business-rules.md)
 |---|---|---|---|
 | Q-CR1-01 | MVP chỉ gồm **A1**, còn A2 ra ngay sau ở Release 1.1? Hay đưa luôn A2 vào MVP? | ✅ **Confirmed – chỉ A1 trong MVP.** Làm A1 thật chất lượng để có người dùng thật sớm. A2 chủ yếu là nhập nội dung, hệ thống đã có sẵn | Đưa A2 vào MVP sẽ làm phần nội dung gần gấp đôi (khoảng 1.300 đơn vị từ A2 theo Goethe), lùi ngày ra beta |
 | Q-CR1-02 | Info Hub MVP gồm: **Ausbildung, Công nhận văn bằng, Lộ trình học tiếng Đức và các kỳ thi chứng chỉ**. Chủ đề **du học đại học Đức** để V2? | ✅ **Confirmed** | Đúng persona chính (Ausbildung). Du học đại học là hồ sơ khác (Studienkolleg, APS…), cần nghiên cứu thêm |
+
+## 9b. CR-002 – Quyết định (Confirmed 2026-11-22, phương án 2)
+
+| # | Câu hỏi | Đề xuất | Trạng thái |
+|---|---|---|---|
+| Q-CR2-01 | Phạm vi đưa vào MVP | **Phương án 2**: toàn bộ tầng A (Bàn học, streak + nhiệm vụ, SRS, khách vào học ngay + ngữ pháp công khai, mini-game Nối từ, PWA), khoảng +20–27 ngày. Tầng B vào Release 1.1. Phương án 1 (tinh gọn: A1+A2+A3, +13–17 ngày) hoặc 3 (giữ MVP cũ) | ✅ **Confirmed** |
+| Q-CR2-02 | Thêm module **Engagement** (schema `engagement`) | Đồng ý | ✅ **Confirmed** (nằm trong phương án 2) |
+| Q-CR2-03 | Hướng hình ảnh "Bàn học" | Gradient + vector tự thiết kế. Không dùng ảnh nền phong cách hãng phim | ⏳ **Chưa trả lời riêng.** Tạm theo đề xuất, sẽ hỏi lại trước khi làm giao diện Bàn học |
+
+**Quyết định đã rút ra từ khảo sát (không cần chờ):**
+- Giữ nguyên **BR-INFO-05** (không in lương, chi phí khi chưa có nguồn chính thức), dù đối thủ làm.
+- **Không** dùng đề thi, audio của nhà xuất bản, video/phụ đề của chương trình truyền hình, hay ảnh nền của hãng phim.
+- **Không** làm phễu thu số điện thoại hay "bao đậu" (ngoài phạm vi, trái BR-PRIV-01).
+
+**Đã chuyển từ V2 lên MVP:** Flashcards + Spaced Repetition, streak. Thêm vào MVP: Bàn học, nhiệm vụ ngày, khách vào học ngay + ngữ pháp công khai, mini-game Nối từ, PWA.
+
+## 9c. CR-003 – Cá nhân hóa học từ Brottin (Confirmed 2026-11-22, phương án 2)
+
+Tài liệu: [CR-003](../change-requests/CR-003-personalization-from-brottin.md), [phân tích sâu Brottin](../research/02-brottin-deep-dive.md).
+
+**Quyết định đã rút ra (hiệu lực ngay, không cần chờ):**
+| ID | Quyết định |
+|---|---|
+| D1 | **Không dùng dữ liệu từ vựng của Brottin** (file CSV/Excel xuất, hay nội dung khác) trong ADUO. Lý do: điều khoản của họ cấm sao chép hàng loạt/phát hành lại; file không có nguồn/giấy phép (vi phạm BR-CNT-01); chất lượng chưa đạt (55% danh từ thiếu số nhiều). Xếp Group D |
+| D2 | Được học ý tưởng, cấu trúc, trải nghiệm và tự xây nội dung riêng |
+| D3 | File CSV đã tải chỉ để tự học/tham khảo, **không đặt trong thư mục dự án** |
+| D4 | Nội dung có hỗ trợ AI phải có **nhãn hiển thị** theo `Origin`; bản dịch AI luôn qua duyệt |
+
+**Quyết định của chủ dự án:**
+| # | Câu hỏi | Đề xuất | Trạng thái |
+|---|---|---|---|
+| Q-CR3-01 | Phạm vi vào MVP | **Phương án 2**: toàn bộ tầng A (chế độ học từ, thẻ giàu thông tin, cài đặt cá nhân hóa, Lưu từ + Từ của tôi, phím tắt, nhãn AI), +12–14 ngày. Giữ **điểm kiểm tra** sau Identity + ContentOps 2a + Lexicon | ✅ **Confirmed** |
+| Q-CR3-02 | Thử xin phép Brottin bằng văn bản | Có, bạn tự gửi, không phụ thuộc câu trả lời | ⏳ Chưa trả lời. Việc của chủ dự án, không chặn tiến độ |
+| Q-CR3-03 | V2: cho phép gửi **một từ + cấp độ** lên API AI (sửa BR-PRIV-03) | Đồng ý, chỉ ở V2 | ⏳ Quyết ở V2 |
 
 ## 10. Known Issues / Open Verification
 Xem [04-license-assessment.md §5](04-license-assessment.md). Các trang chưa đọc được trực tiếp:

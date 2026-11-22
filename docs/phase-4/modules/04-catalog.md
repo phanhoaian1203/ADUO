@@ -154,3 +154,11 @@ Gồm mô tả, tổng thời lượng, danh sách unit và bài. Mỗi bài có
 - [ ] CA-T01..14 pass.
 - [ ] Có 1 khóa A1 với ≥ 1 unit Published, học được trên điện thoại thật, LCP < 2,5 giây (NFR-01).
 - [ ] Không có N+1 khi tải bài học.
+
+## 10. [ĐÃ CHỐT – CR-002, phương án 2] Thay đổi liên quan
+> Đã chốt ngày 2026-11-22 (CR-002, phương án 2). Đây là kế hoạch chính thức.
+
+- **Trang Lộ trình trực quan (B1, Release 1.1):** `/lo-trinh` hiển thị hành trình A1 → B1 (→ B2) theo từng mốc, mỗi mốc gắn một địa danh Đức bằng **hình minh họa vector do ta tự thiết kế** (không dùng ảnh nền của người khác), chia theo tuần, và nút bấm thẳng vào bài tương ứng. Dữ liệu lấy từ cây khóa học hiện có, **không thêm bảng mới**: chỉ cần thêm `week_hint` và `milestone_label` vào `units`.
+- **Cho khách vào học:** bài học có `is_preview` **hoặc** thuộc nhóm công khai vẫn mở cho khách. Hội thoại ngắn (khối `Dialogue`) có thể đánh dấu công khai.
+- Mỗi bài học nên có **thời lượng ước tính hiển thị rõ** ("12 phút") và nhãn nội dung ("Từ vựng · Ngữ pháp · Hội thoại").
+- Test bổ sung: **CA-T15** `/lo-trinh` chỉ hiển thị nhánh đã Published.

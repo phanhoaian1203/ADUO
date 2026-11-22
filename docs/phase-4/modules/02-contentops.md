@@ -287,3 +287,11 @@ Xem [Phase 3 – 03 §8](../../phase-3/03-api-design.md) và §7 (báo lỗi, at
 - [ ] Không có đường nào publish nội dung mà không đi qua `PublishGuard` (kiểm bằng architecture test: chỉ `ContentLifecycle` được set `Status`).
 - [ ] Trang Attribution hiển thị đúng nguồn cho nội dung thật đầu tiên.
 - [ ] Trần chi phí đã được thử với số liệu giả.
+
+## 10. [ĐÃ CHỐT – CR-003, phương án 2] Nhãn nội dung AI (A6)
+
+- **Quy tắc hiển thị (mở rộng BR-LEX-05):** mọi nội dung hiển thị cho người học có `Origin = AIDraft` hoặc `AIDraftHumanEdited` phải mang nhãn **"Có hỗ trợ AI"** (ví dụ, nghĩa, giải thích, câu hỏi, bài viết). Nhãn nhỏ, chạm vào có chú giải ("Nội dung này được AI viết nháp và đã được duyệt").
+- **Trang "Cách chúng tôi dùng AI"** (công khai): nêu những gì AI hỗ trợ, rằng nội dung luôn qua duyệt, AI có thể sai, và người học có thể **báo lỗi**. Học theo cách Brottin nêu rõ về AI trong điều khoản của họ.
+- **Bản dịch AI luôn qua duyệt** (đã có trong BR-CNT-07, nhấn mạnh lại sau khi thấy dấu hiệu bản dịch chưa rà ở Brottin).
+- **API:** `Origin` được trả về trong DTO công khai của Lexicon, Assessment, InfoHub dưới dạng cờ `aiAssisted` (bool), không lộ tên mô hình.
+- **Test bổ sung:** **CO-T21** nội dung `AIDraftHumanEdited` có `aiAssisted=true`. **CO-T22** nội dung `HumanAuthored` có `aiAssisted=false`.

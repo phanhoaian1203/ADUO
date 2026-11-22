@@ -189,3 +189,23 @@ Với mỗi bước ở trên:
 7. Cập nhật tài liệu và decision log.
 
 Module chỉ được coi là **xong** khi CI xanh và mọi Acceptance Criteria liên quan ở [Phase 2 – 04](../phase-2/04-user-stories.md) đều đạt.
+
+## 5. Tài liệu chi tiết từng module
+Mỗi tài liệu gồm: mục tiêu và phạm vi, **kiến thức lập trình bạn sẽ học**, mô hình miền và bất biến, luồng xử lý chi tiết, dữ liệu, API, giao diện, bảo mật, **test case kèm kết quả mong đợi**, các bước triển khai, Definition of Done.
+
+| Module | Tài liệu |
+|---|---|
+| 0 – Foundation | [modules/00-foundation.md](modules/00-foundation.md) |
+| 1 – Identity | [modules/01-identity.md](modules/01-identity.md) |
+| 2 – ContentOps | [modules/02-contentops.md](modules/02-contentops.md) |
+| 3 – Lexicon | [modules/03-lexicon.md](modules/03-lexicon.md) |
+| 4 – Catalog | [modules/04-catalog.md](modules/04-catalog.md) |
+| 5 – Assessment | [modules/05-assessment.md](modules/05-assessment.md) |
+| 6 – Progress | [modules/06-progress.md](modules/06-progress.md) |
+| 7 – InfoHub | [modules/07-infohub.md](modules/07-infohub.md) |
+
+**Bổ sung vào Phase 3 – 02 trong quá trình phân tích chi tiết:**
+- `identity.data_protection_keys`.
+- `lexicon.vocabulary_entries.gloss_en`.
+- `lexicon.saved_entries` (Should).
+- `progress.lesson_progress.reached_end`.

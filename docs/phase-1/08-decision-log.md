@@ -67,7 +67,17 @@ Rule chi tiết: [phase-2/03-business-rules.md](../phase-2/03-business-rules.md)
 - Phase 1: Confirmed. **Cập nhật v2 theo CR-001** ngày 2026-11-22.
 - Phase 2: Confirmed. **Cập nhật v2 theo CR-001** ngày 2026-11-22.
 - Phase 3 – Architecture & UI/UX: **Confirmed** 2026-11-22. Tiếp theo: Phase 4 – MVP Development ([docs/phase-3](../phase-3/00-README.md)).
-- Chưa có code.
+- Phase 4 – Bước 1 **Foundation: xong và đã xác minh đầy đủ, chưa commit** (2026-11-22). 51 test pass (39 unit, 3 architecture, 9 integration). Migration `Init` đã áp dụng được lên PostgreSQL 17 thật (7 schema + `pg_trgm`, `unaccent`), rollback về 0 rồi áp dụng lại đều chạy đúng. Trang web hiển thị "API: OK" và "Cơ sở dữ liệu: OK" qua proxy cùng origin.
+
+### Điều chỉnh so với thiết kế khi code Foundation
+| Thay đổi | Lý do |
+|---|---|
+| Health endpoint viết bằng minimal API thay vì `MapHealthChecks` | Để `/api/health` xuất hiện trong OpenAPI và frontend sinh được kiểu TypeScript |
+| Sink Serilog cấu hình bằng code (không để trong appsettings) | Dev dùng log chữ dễ đọc, môi trường khác dùng JSON; tránh phải sửa cấu hình nhiều chỗ |
+| `Microsoft.OpenApi` ghim 2.13.1 | Bản 2.0.0 đi kèm có lỗ hổng GHSA-v5pm-xwqc-g5wc (build bị chặn vì `TreatWarningsAsErrors`) |
+| Dùng EF Core / Npgsql bản 10.x (không phải 11.x mới nhất) | Bản 11.x chỉ hỗ trợ net11.0, trong khi dự án dùng .NET 10 LTS |
+| Next.js 16 + shadcn dùng `@base-ui/react` (không phải Radix) | Mặc định của shadcn hiện tại. Component API tương tự |
+| Integration test chia hai nhóm: có DB (Testcontainers) và không DB | Phần lớn test HTTP không cần DB, nên chạy nhanh và không cần Docker |
 
 ## 8. Phase 2 – Quyết định (Confirmed 2026-11-22)
 | # | Câu hỏi | Kết quả | Ghi chú sau CR-001 |

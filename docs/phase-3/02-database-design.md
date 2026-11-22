@@ -91,6 +91,7 @@ Ký hiệu: **PK** khóa chính · **FK** khóa ngoại · **UQ** unique · **IX
 |---|---|---|
 | `users` (bảng Identity, mở rộng) | `id` uuid PK, `email`, `normalized_email`, `email_confirmed`, `password_hash` (null nếu chỉ đăng nhập Google), `display_name` (2–50), `avatar_media_id` null, `learning_purpose` (`Ausbildung`\|`Nursing`\|`Recognition`\|`Study`\|`Other`) null, `target_level` (`A1`\|`A2`\|`B1`) null, `created_at`, `deleted_at` null, `anonymized_at` null, lockout fields của Identity | UQ `normalized_email`. CK `learning_purpose`, `target_level`. IX `deleted_at` (partial: not null), phục vụ job purge |
 | `user_logins`, `user_tokens`, `user_roles`, `roles` | Bảng chuẩn của Identity | Google login nằm ở `user_logins` |
+| `data_protection_keys` | `id`, `friendly_name`, `xml` | Khóa mã hóa cookie của ASP.NET Data Protection. Lưu bền vững để deploy không đăng xuất người dùng |
 | `user_consents` | `id`, `user_id` FK, `terms_version`, `privacy_version`, `consented_at`, `minor_guardian_confirmed` bool | IX `user_id`. Lưu mỗi lần đồng ý một phiên bản mới (BR-AUTH-04) |
 
 ### 3.2 `catalog`
@@ -118,13 +119,14 @@ Mỗi kiểu có một record C# và validator riêng.
 ### 3.3 `lexicon`
 | Bảng | Cột chính | Ràng buộc / Index |
 |---|---|---|
-| `vocabulary_entries` 🧾 | `id`, `language_code`, `lemma` (`Mädchen`), `lemma_search` (lowercase, đã chuyển `ä→ae`, `ß→ss`), `homograph_no` smallint mặc định 1, `part_of_speech` (`Noun`\|`Verb`\|`Adjective`\|`Adverb`\|`Pronoun`\|`Preposition`\|`Conjunction`\|`Numeral`\|`Phrase`\|`Other`), `gender` (`m`\|`f`\|`n`) null, `plural` null, `noun_number` (`Normal`\|`NoPlural`\|`PluralOnly`) null, `ipa` null, `is_separable` bool, `is_irregular` bool, `forms` jsonb null, `cefr_level` (`A1`…), `meaning_vi`, `meaning_vi_search` (lowercase, bỏ dấu), `notes_vi` null, `audio_media_id` null | **UQ `(language_code, lemma, part_of_speech, homograph_no)`** (BR-CNT-10). IX GIN trigram trên `lemma_search` và `meaning_vi_search`. IX `(cefr_level, status)`. **CK**: `part_of_speech='Noun' AND status='Published'` ⇒ `gender IS NOT NULL AND noun_number IS NOT NULL` (BR-LEX-01) |
+| `vocabulary_entries` 🧾 | `id`, `language_code`, `lemma` (`Mädchen`), `lemma_search` (lowercase, đã chuyển `ä→ae`, `ß→ss`), `homograph_no` smallint mặc định 1, `part_of_speech` (`Noun`\|`Verb`\|`Adjective`\|`Adverb`\|`Pronoun`\|`Preposition`\|`Conjunction`\|`Numeral`\|`Phrase`\|`Other`), `gender` (`m`\|`f`\|`n`) null, `plural` null, `noun_number` (`Normal`\|`NoPlural`\|`PluralOnly`) null, `ipa` null, `is_separable` bool, `is_irregular` bool, `forms` jsonb null, `cefr_level` (`A1`…), `meaning_vi`, `meaning_vi_search` (lowercase, bỏ dấu), `notes_vi` null, `gloss_en` null (nghĩa tiếng Anh gốc từ Wiktionary, chỉ dùng nội bộ để dịch, không hiển thị), `audio_media_id` null | **UQ `(language_code, lemma, part_of_speech, homograph_no)`** (BR-CNT-10). IX GIN trigram trên `lemma_search` và `meaning_vi_search`. IX `(cefr_level, status)`. **CK**: `part_of_speech='Noun' AND status='Published'` ⇒ `gender IS NOT NULL AND noun_number IS NOT NULL` (BR-LEX-01) |
 | `topics` | `id`, `slug`, `title_vi` | UQ `slug` |
 | `entry_topics` | `entry_id`, `topic_id` | PK ghép |
 | `example_sentences` 🧾 | `id`, `language_code`, `text_de`, `text_vi`, `cefr_level` null, `audio_media_id` null | IX trigram `text_de` (tìm ví dụ chứa từ) |
 | `entry_examples` | `entry_id`, `sentence_id`, `sort_order` | PK ghép |
 | `grammar_points` 🧾 | `id`, `language_code`, `slug`, `title_vi`, `structure` (ví dụ `Subjekt + Verb (Pos. 2) + …`), `explanation_md`, `common_mistakes_md`, `cefr_level` | UQ `(language_code, slug)` |
 | `grammar_examples` | `grammar_point_id`, `sentence_id`, `sort_order` | PK ghép |
+| `saved_entries` (Should) | `user_id`, `entry_id`, `saved_at` | PK ghép. "Sổ từ của tôi" |
 
 `forms` (jsonb) chứa hình thái của động từ, phục vụ BR-LEX-02:
 ```json
@@ -172,7 +174,7 @@ Thân câu hỏi `body` (jsonb), mỗi `type` có một record C#:
 | Bảng | Cột chính | Ràng buộc / Index |
 |---|---|---|
 | `enrollments` | `user_id`, `course_id`, `enrolled_at`, `last_activity_at` | PK `(user_id, course_id)` |
-| `lesson_progress` | `user_id`, `lesson_id`, `status` (`InProgress`\|`Completed`), `last_block_id` null, `best_exercise_pct` null, `started_at`, `completed_at` null | PK `(user_id, lesson_id)`. IX `(user_id, status)` |
+| `lesson_progress` | `user_id`, `lesson_id`, `status` (`InProgress`|`Completed`), `last_block_id` null, `reached_end` bool, `best_exercise_pct` null,\|`Completed`), `last_block_id` null, `best_exercise_pct` null, `started_at`, `completed_at` null | PK `(user_id, lesson_id)`. IX `(user_id, status)` |
 | `practice_sessions` | `id`, `user_id`, `question_set_id`, `started_at`, `completed_at` null, `correct`, `total`, `score_pct` | IX `(user_id, started_at DESC)` |
 | `answer_events` | `id` bigint identity PK, `user_id`, `question_id`, `skill`, `category_id`, `source` (`Practice`\|`Exam`), `source_id`, `fraction` numeric(4,3) (0–1), `occurred_at` | IX `(user_id, occurred_at DESC)`. IX `(question_id)` |
 

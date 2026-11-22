@@ -1,0 +1,33 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+logs/
+*.log
+TestResults/
+coverage/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Bí mật: TUYỆT ĐỐI không commit. Chỉ commit file .example
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+secrets.json
+
+# Dữ liệu thô quá lớn (dump Wiktionary…): tải riêng, không commit
+data/raw/
+
+# Editor / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db

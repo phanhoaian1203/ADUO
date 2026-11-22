@@ -1,0 +1,21 @@
+# PostgreSQL cho máy dev. Chạy:  docker compose -f deploy/compose.dev.yml up -d
+# Mật khẩu ở đây CHỈ dùng cho máy local, không bao giờ dùng ở staging/production.
+name: aduo-dev
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: aduo_dev
+      POSTGRES_USER: aduo
+      POSTGRES_PASSWORD: aduo_dev_only
+    ports:
+      - "127.0.0.1:5432:5432"   # chỉ mở cho localhost
+    volumes:
+      - aduo-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aduo -d aduo_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  aduo-pgdata:

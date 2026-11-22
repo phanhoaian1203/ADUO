@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Aduo.Api/Aduo.Api.csproj" />
+    <Project Path="src/Aduo.Cli/Aduo.Cli.csproj" />
+    <Project Path="src/Aduo.Core/Aduo.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Aduo.Api.IntegrationTests/Aduo.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Aduo.ArchitectureTests/Aduo.ArchitectureTests.csproj" />
+    <Project Path="tests/Aduo.Core.Tests/Aduo.Core.Tests.csproj" />
+  </Folder>
+</Solution>

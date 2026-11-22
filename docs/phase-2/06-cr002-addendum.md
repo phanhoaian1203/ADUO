@@ -143,3 +143,42 @@ Nguồn: [CR-003](../change-requests/CR-003-personalization-from-brottin.md), [p
 
 ## 11. Truy vết bổ sung
 UC-41..44 → FR-ENG-10..15, FR-LEX-09..10, FR-ASM-13, FR-CMS-11 → BR-ENG-10..13, BR-LEX-05 → US-65..68 → test EN-T23..35, LX-T18..20, AS-T39..41, CO-T21..22, ID-T23.
+
+---
+
+# Bổ sung theo AD-09 (xác thực JWT hybrid, đã chốt 2026-11-22)
+
+Thiết kế: [01-identity.md §14](../phase-4/modules/01-identity.md).
+
+## 12. Use case và yêu cầu chức năng mới
+| ID | Tên / Yêu cầu | Ưu tiên |
+|---|---|---|
+| UC-45 | Làm mới phiên tự động (người dùng không nhận ra) | Must |
+| UC-46 | Xem và thu hồi các thiết bị đăng nhập | Must |
+| UC-47 | Đăng xuất mọi thiết bị | Must |
+| FR-ID-10 | Phiên gồm access token ngắn hạn và refresh token xoay vòng, truyền bằng cookie HttpOnly | M |
+| FR-ID-11 | Trang "Thiết bị đăng nhập": danh sách, thu hồi từng thiết bị | M |
+| FR-ID-12 | "Đăng xuất mọi thiết bị" | M |
+| FR-ID-13 | Phiên Admin ngắn (tối đa 12 giờ) và yêu cầu đăng nhập gần đây cho thao tác Admin | M |
+| FR-ID-14 | Nhật ký sự kiện bảo mật, IP rút gọn, giữ 180 ngày | M |
+| NFR-23 | Thu hồi phiên có hiệu lực tối đa 60 giây (học viên) và tức thì (Admin, hành động nhạy cảm) | Kiểm tra bằng test ID-T34, T37 |
+
+## 13. User stories mới
+**US-69 Phiên đăng nhập an toàn** (FR-ID-10, BR-AUTH-10..12)
+- AC1: Đăng nhập xong, tôi không phải nhập lại trong lúc dùng bình thường dù access token chỉ sống 10 phút (phiên tự làm mới).
+- AC2: Nếu tôi không chọn "Ghi nhớ", đóng trình duyệt rồi mở lại thì phải đăng nhập lại.
+- AC3: Dù dùng đều đặn, sau hạn tuyệt đối (7 ngày, hoặc 90 ngày nếu chọn "Ghi nhớ") tôi phải đăng nhập lại.
+- AC4: Nếu ai đó dùng lại một refresh token cũ của tôi, mọi phiên của chuỗi đó bị thu hồi và tôi cần đăng nhập lại.
+
+**US-70 Thiết bị đăng nhập** (FR-ID-11, 12, BR-AUTH-14, 16)
+- AC1: Trong Hồ sơ tôi thấy danh sách thiết bị: tên thiết bị, lần dùng gần nhất, vị trí gần đúng (IP rút gọn), thiết bị hiện tại được đánh dấu.
+- AC2: Bấm "Đăng xuất thiết bị này" thì thiết bị đó không dùng được nữa trong tối đa 60 giây.
+- AC3: Bấm "Đăng xuất mọi thiết bị" thì mọi thiết bị đều phải đăng nhập lại.
+- AC4: Đổi mật khẩu cũng đăng xuất các thiết bị khác.
+
+**US-71 Phiên Admin** (FR-ID-13, BR-AUTH-13, 15)
+- AC1: Admin không có tùy chọn "Ghi nhớ" và bị đăng xuất sau tối đa 12 giờ.
+- AC2: Khi một Admin bị khóa, mọi thao tác Admin của người đó bị từ chối ngay lập tức.
+- AC3: Thao tác Admin khi lần nhập mật khẩu gần nhất đã quá 12 giờ yêu cầu đăng nhập lại.
+
+Test tương ứng: ID-T24..ID-T45 (01-identity §14.14).

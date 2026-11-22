@@ -108,7 +108,7 @@ Logic nghiệp vụ nằm trong `Domain/` để unit test được mà không c�
 Aduo.Api/
 ├── Program.cs                 # Đăng ký module, auth, rate limit, ProblemDetails, OpenAPI, health
 ├── Middleware/                # CorrelationId, SecurityHeaders
-├── Auth/                      # Cấu hình cookie, Google, antiforgery, permission policies
+├── Auth/                      # Cấu hình JWT bearer (đọc từ cookie hoặc header), Google, antiforgery, permission policies
 ├── appsettings.json           # Giá trị không bí mật
 └── appsettings.Development.json
 ```

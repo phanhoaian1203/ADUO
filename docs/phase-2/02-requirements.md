@@ -112,7 +112,7 @@ Mức ưu tiên dùng MoSCoW. **M** = Must (bắt buộc cho MVP), **S** = Shoul
 | NFR-05 | Sẵn sàng | Mục tiêu 99% mỗi tháng (một VPS, chấp nhận bảo trì ngắn có báo trước) | Uptime monitor (ví dụ UptimeRobot free) |
 | NFR-06 | Sao lưu | Backup DB hằng ngày, giữ 7 bản ngày + 4 bản tuần, lưu **ngoài VPS** (R2). **RPO ≤ 24 giờ, RTO ≤ 4 giờ** | Diễn tập khôi phục mỗi quý |
 | NFR-07 | Toàn vẹn thi | Không mất câu trả lời đã lưu khi rớt mạng. Giờ thi tính theo server | Integration test |
-| NFR-08 | Bảo mật | Theo OWASP Top 10. HTTPS bắt buộc (HSTS). Cookie HttpOnly + Secure + SameSite=Lax. Chống CSRF cho request đổi trạng thái. CSP | Checklist bảo mật Phase 5 |
+| NFR-08 | Bảo mật | Theo OWASP Top 10. HTTPS bắt buộc (HSTS). Token trong cookie HttpOnly + Secure + SameSite=Lax (web), JWT ngắn hạn, refresh token xoay vòng và thu hồi được. Chống CSRF cho request đổi trạng thái. CSP | Checklist bảo mật Phase 5 |
 | NFR-09 | Bảo mật – xác thực | Hash mật khẩu bằng ASP.NET Core Identity (PBKDF2). Khóa tạm 15 phút sau 5 lần sai. Rate limit đăng nhập, đăng ký, quên mật khẩu theo IP | Test |
 | NFR-10 | Quyền riêng tư | Thu thập tối thiểu. Lưu bằng chứng đồng ý. Xóa tài khoản trong 30 ngày. Không gửi dữ liệu người học cho API AI | Review Phase 3 |
 | NFR-11 | Khả dụng & tiếp cận | Mobile-first, từ 360px trở lên. Theo WCAG 2.1 AA cơ bản: tương phản, focus, label, alt, điều khiển được bằng bàn phím | axe / Lighthouse a11y ≥ 90 |

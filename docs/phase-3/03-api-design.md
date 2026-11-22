@@ -57,7 +57,7 @@
 | 500 | Lỗi hệ thống | `INTERNAL_ERROR` (không lộ chi tiết) |
 
 ### 1.5 Bảo mật mỗi request
-- Cookie xác thực (HttpOnly). Mọi request thay đổi dữ liệu phải gửi header **`X-XSRF-TOKEN`** (file 01 §4.2).
+- Web: token nằm trong **cookie `HttpOnly`** (access `__Host-aduo_at`, refresh `__Secure-aduo_rt`). Mọi request thay đổi dữ liệu phải gửi header **`X-XSRF-TOKEN`** (file 01 §4.2). Client native dùng `Authorization: Bearer` (xem §12).
 - Concurrency: các API sửa nội dung ở admin nhận `version` trong body. Nếu lệch thì trả 409 `CONCURRENCY_CONFLICT`.
 - **OpenAPI** sinh tự động (`Microsoft.AspNetCore.OpenApi`) tại `/api/openapi/v1.json`, chỉ bật ở Development và Staging. Frontend sinh kiểu TypeScript từ file này.
 
@@ -72,7 +72,7 @@
 |---|---|---|---|---|
 | GET | `/auth/csrf` | Public | Cấp cookie XSRF-TOKEN | |
 | POST | `/auth/register` | Public | Đăng ký | BR-AUTH-01..04 |
-| POST | `/auth/login` | Public | Đăng nhập | BR-AUTH-06 |
+| POST | `/auth/login` | Public | Đăng nhập, cấp cặp cookie token (xem §12) | BR-AUTH-06, 10 |
 | POST | `/auth/logout` | Auth | Đăng xuất | |
 | GET | `/auth/external/google?returnUrl=` | Public | Chuyển hướng sang Google | BR-AUTH-09 |
 | GET | `/auth/external/google/callback` | Public | Google gọi lại | |
@@ -272,3 +272,28 @@ Cấu trúc thư mục: thêm `Aduo.Core/Modules/Engagement/` theo mẫu module 
 | GET | `/me/srs/session?mode=&limit=` | Auth | Thêm tham số `mode` (`Mixed`, `Review`, `Flashcard`, `ChoiceViVi`, `ChoiceReverse`, `Guess`, `Artikel`) |
 
 DTO công khai của nội dung có thêm cờ `aiAssisted` (bool). Thẻ từ trả thêm `synonyms`, `collocations`, `wordFamily`, `usageNotesVi`.
+
+## 12. [ĐÃ CHỐT – AD-09] API phiên JWT
+
+Chi tiết nghiệp vụ: [01-identity.md §14](../phase-4/modules/01-identity.md). **Token không bao giờ nằm trong body response của web** (chỉ ở cookie `HttpOnly`).
+
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| POST | `/auth/login` | Public | Thành công: cấp cặp cookie token, trả `MeResponse`. Thay đổi so với §2: không còn cookie đăng nhập của Identity |
+| POST | `/auth/refresh` | Cookie refresh + **XSRF** | Xoay vòng, cấp access và refresh mới. Lỗi: 401 `TOKEN_EXPIRED`, `REFRESH_REUSED`, `SESSION_REVOKED` |
+| POST | `/auth/logout` | Auth | Thu hồi chuỗi hiện tại, xóa cookie |
+| POST | `/auth/logout-all` | Auth | Thu hồi mọi chuỗi + đổi `SecurityStamp` |
+| GET | `/me/sessions` | Auth | Danh sách thiết bị đang đăng nhập: `{id, deviceLabel, lastUsedAt, ipPrefix, isCurrent}` |
+| DELETE | `/me/sessions/{id}` | Auth | Thu hồi một thiết bị (không thu hồi được phiên của người khác) |
+| POST | `/auth/token` | Public | **Ngoài MVP.** Dành cho client native: trả cặp token trong JSON |
+
+**Mã lỗi mới (ProblemDetails `code`):**
+| Code | HTTP | Khi nào |
+|---|---|---|
+| `TOKEN_EXPIRED` | 401 | Access token hết hạn. Frontend gọi `/auth/refresh` rồi thử lại **một lần** |
+| `TOKEN_REVOKED` | 401 | Phiên hoặc `SecurityStamp` không còn hợp lệ |
+| `REFRESH_REUSED` | 401 | Refresh token bị dùng lại, **cả chuỗi bị thu hồi** |
+| `SESSION_REVOKED` | 401 | Phiên đã bị thu hồi |
+| `REAUTH_REQUIRED` | 401 | Endpoint Admin yêu cầu đăng nhập lại (quá 12 giờ) |
+
+**Cookie:** xem bảng ở 01-identity §14.7. Mọi endpoint POST, PUT, PATCH, DELETE (kể cả `/auth/refresh`) cần header `X-XSRF-TOKEN`, trừ request chỉ dùng `Authorization: Bearer`.

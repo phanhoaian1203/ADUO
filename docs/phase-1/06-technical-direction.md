@@ -23,7 +23,7 @@ Thiết kế chi tiết (ERD, API, cấu trúc thư mục) để ở Phase 3. Fi
 | Backend | **ASP.NET Core (.NET 10 LTS)** Web API, C# | Đúng mục tiêu học của bạn. Hiệu năng tốt. LTS dài | .NET 8 (LTS cũ hơn) |
 | ORM | **EF Core** + migrations | Chuẩn của .NET, có migration | Dapper cho các query thống kê nặng |
 | Database | **PostgreSQL** | Miễn phí, nhiều gói host rẻ hoặc free. Có `jsonb` cho metadata riêng của từng chương trình. Có full-text search và `pg_trgm` cho tìm từ tiếng Đức (cả dạng có và không có Umlaut) và nghĩa tiếng Việt không dấu | SQL Server: license và hosting đắt hơn. Bản Express giới hạn 10 GB |
-| Auth | **ASP.NET Core Identity** + cookie (HttpOnly, SameSite) cho web. JWT nếu sau này làm app mobile | Có sẵn hash mật khẩu, khóa tài khoản, xác minh email | Auth0/Clerk: phụ thuộc bên ngoài, tốn phí khi lớn |
+| Auth | **ASP.NET Core Identity** (quản lý người dùng) + **JWT access token ngắn hạn + refresh token xoay vòng** (AD-09). Web nhận token qua cookie HttpOnly, app mobile sau này dùng bearer | Có sẵn hash mật khẩu, khóa tạm, xác minh email, Google login; mô hình token dùng được lâu dài | Cookie session thuần (đơn giản hơn nhưng khó mở rộng sang mobile/bên thứ ba), Auth0/Clerk (phụ thuộc bên ngoài, tốn phí khi lớn) |
 | Frontend | **Next.js (App Router) + TypeScript + Tailwind + shadcn/ui** | SSR/SSG tốt cho SEO ở landing page và Info Hub. Hệ sinh thái lớn | React + Vite (SPA): đơn giản hơn nhưng SEO kém hơn |
 | State / Data fetching | **TanStack Query** + Zustand (nếu cần) | Cache dữ liệu server, ít boilerplate | Redux Toolkit: nặng cho quy mô này |
 | Form | **React Hook Form + Zod** | Chuẩn phổ biến | |

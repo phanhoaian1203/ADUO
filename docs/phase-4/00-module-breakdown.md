@@ -9,7 +9,7 @@ Hệ thống gồm **1 nền tảng dùng chung (Foundation)** và **7 module ng
 | # | Module | Một câu mô tả | Schema DB | Số bảng | Người dùng chính |
 |---|---|---|---|---|---|
 | 0 | **Foundation** (không phải module nghiệp vụ) | Khung dự án, hạ tầng dùng chung, CI/CD | — | — | Bạn (dev) |
-| 1 | **Identity** | Tài khoản, đăng nhập, hồ sơ, mục đích học | `identity` | 3 (+ bảng chuẩn của Identity) | Mọi người |
+| 1 | **Identity** | Tài khoản, đăng nhập (JWT access + refresh token, AD-09), hồ sơ, mục đích học, quản lý thiết bị đăng nhập | `identity` | 5 (+ bảng chuẩn của Identity) | Mọi người |
 | 2 | **ContentOps** | Nguồn, giấy phép, media, import, duyệt, AI, TTS, báo lỗi, dashboard | `content` | 11 | Admin (báo lỗi: Student) |
 | 3 | **Lexicon** | Từ vựng tiếng Đức, câu ví dụ, chủ đề, điểm ngữ pháp | `lexicon` | 7 | Student, Admin |
 | 4 | **Catalog** | Chương trình, cấp độ, khóa, unit, bài học, khối nội dung | `catalog` | 8 | Guest, Student, Admin |
@@ -55,14 +55,14 @@ Mũi tên A → B nghĩa là A **cần** B (dùng dữ liệu hoặc interface c
 |---|---|
 | Mục đích | Cho người dùng tạo tài khoản, đăng nhập an toàn, khai báo mục đích học; cho Admin có quyền quản trị |
 | Chức năng | Đăng ký email + mật khẩu (kèm ô đồng ý điều khoản, xác nhận phụ huynh nếu dưới 16 tuổi). Xác minh email. Đăng nhập, đăng xuất, "Ghi nhớ". **Đăng nhập Google**. Quên và đặt lại mật khẩu. Hồ sơ: tên, ảnh, **mục đích học** (Ausbildung / Điều dưỡng / Công nhận nghề / Du học / Khác), **cấp độ mục tiêu** (A1 / A2 / B1). Đổi mật khẩu. Xóa tài khoản (ẩn danh trong ≤ 30 ngày). Admin: khóa và mở khóa tài khoản. CLI: `create-admin` |
-| Bảng | `users` (mở rộng từ Identity), `user_consents`, các bảng chuẩn của Identity (`user_logins`, `user_tokens`, `roles`, `user_roles`) |
-| API | `/auth/*` (register, login, logout, google, confirm-email, forgot/reset-password, csrf), `/me` (GET/PATCH), `/me/change-password`, `/me/delete`, `/admin/users/*` |
-| Business rules | BR-AUTH-01..09, BR-PRIV-01..04 |
-| Màn hình | Đăng ký, Đăng nhập, Quên mật khẩu, Đặt lại mật khẩu, Xác minh email, **Onboarding 2 bước**, Hồ sơ, Admin: Người dùng |
-| Job | `PurgeDeletedAccounts` (hằng ngày) |
+| Bảng | `users` (mở rộng từ Identity), `user_consents`, **`refresh_tokens`, `auth_events`**, các bảng chuẩn của Identity (`user_logins`, `user_tokens`, `roles`, `user_roles`) |
+| API | `/auth/*` (register, login, **refresh**, logout, **logout-all**, google, confirm-email, forgot/reset-password, csrf), `/me/sessions`, `/me` (GET/PATCH), `/me/change-password`, `/me/delete`, `/admin/users/*` |
+| Business rules | BR-AUTH-01..17, BR-PRIV-01..04 |
+| Màn hình | Đăng ký, Đăng nhập, Quên mật khẩu, Đặt lại mật khẩu, Xác minh email, **Onboarding 2 bước**, Hồ sơ, **Thiết bị đăng nhập**, Admin: Người dùng |
+| Job | `PurgeDeletedAccounts` (hằng ngày), `CleanupExpiredSessions` (hằng ngày: xóa refresh token và nhật ký bảo mật quá hạn) |
 | Tích hợp ngoài | Google OAuth, nhà cung cấp email (SMTP) |
 | Kiểm thử trọng tâm | Khóa tạm sau 5 lần sai, link hết hạn, chống dò email, CSRF, phân quyền |
-| Ước tính | 6–8 ngày công |
+| Ước tính | **11–15 ngày công** (từ 6–8, do AD-09: JWT hybrid, refresh token xoay vòng, thiết bị đăng nhập, nhật ký bảo mật) |
 
 ### 2. ContentOps – vận hành nội dung
 Module lớn nhất phía Admin, nên được chia làm hai đợt.
@@ -236,5 +236,5 @@ Chi tiết: [modules/08-engagement.md](modules/08-engagement.md). Các module 1,
 | 10 | InfoHub |
 | 11 | ContentOps 2b |
 
-**Tổng ước tính code MVP: khoảng 88–119 ngày công** (56–78 ban đầu, 76–105 sau CR-002, 88–119 sau CR-003). Lexicon tăng 3–4 ngày (thẻ giàu thông tin), ContentOps tăng 1 ngày (nhãn AI), Engagement tăng 8–9 ngày. **Giữ điểm kiểm tra:** sau Identity + ContentOps 2a + Lexicon, đo tốc độ thực rồi quyết định giữ hay hoãn các tầng A (CR-002, CR-003).
+**Tổng ước tính code MVP: khoảng 93–126 ngày công** (56–78 ban đầu, 76–105 sau CR-002, 88–119 sau CR-003, 93–126 sau AD-09 JWT hybrid). Lexicon tăng 3–4 ngày (thẻ giàu thông tin), ContentOps tăng 1 ngày (nhãn AI), Engagement tăng 8–9 ngày. **Giữ điểm kiểm tra:** sau Identity + ContentOps 2a + Lexicon, đo tốc độ thực rồi quyết định giữ hay hoãn các tầng A (CR-002, CR-003).
 Ước tính thô, sẽ chỉnh sau khi đo tốc độ thực ở module Identity.

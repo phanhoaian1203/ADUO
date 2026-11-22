@@ -123,14 +123,16 @@ Request (HTTP) → Endpoint (Minimal API) → Validator (FluentValidation) → H
 ## 4. Authentication & Authorization
 
 ### 4.1 Authentication
-- **ASP.NET Core Identity** với khóa chính Guid. Đăng nhập bằng **cookie** (`HttpOnly`, `Secure`, `SameSite=Lax`, thời hạn trượt 14 ngày, "Ghi nhớ" thì 30 ngày).
+- **ASP.NET Core Identity** với khóa chính Guid, dùng cho **quản lý người dùng**: lưu tài khoản, băm mật khẩu, khóa tạm, token xác minh email, đăng nhập Google, `SecurityStamp`. **Không** dùng cookie đăng nhập của Identity (`SignInManager.SignInAsync`).
+- **Phiên đăng nhập = JWT access token (10 phút) + refresh token xoay vòng (AD-09)**, do `SessionService` của module Identity phát hành. Chi tiết: [modules/01-identity.md §14](../phase-4/modules/01-identity.md). Trình duyệt nhận token qua **cookie `HttpOnly`** (JavaScript không đọc được). Client native sau này nhận token qua JSON và gửi bằng header `Authorization: Bearer`. Cùng một mô hình token, hai cách truyền.
 - **Google login:** `AddGoogle()` của Identity (OAuth 2.0). Luồng chạy qua `/api/v1/auth/external/google` (redirect). Liên kết tài khoản theo BR-AUTH-09.
 - Email xác minh và đặt lại mật khẩu dùng token của Identity (`DataProtectorTokenProvider`). Thời hạn: 24 giờ cho xác minh, 1 giờ cho đặt lại (FR-ID-02, 04).
 - Khóa tạm sau 5 lần đăng nhập sai (`LockoutOptions`, BR-AUTH-06).
-- **Lý do không dùng JWT:** web cùng origin nên cookie an toàn hơn (không lưu token trong JS) và đơn giản hơn. Nếu sau này có app mobile thì bật thêm bearer token song song.
+- **Vì sao JWT hybrid (AD-09):** chủ dự án ưu tiên một thiết kế **an toàn và dùng được lâu dài**, không chỉ nhanh cho MVP. Mô hình access + refresh token cho phép thêm app mobile hoặc API cho bên thứ ba mà không đổi gốc rễ. An toàn trước XSS nhờ token **không nằm trong JavaScript**. Thu hồi được nhờ refresh token lưu băm ở server, `SecurityStamp` và kiểm tra phiên. Đánh đổi: phức tạp hơn cookie session thuần túy, nên có bộ test dày (xem ID-T24..T45).
 
 ### 4.2 CSRF
-- `SameSite=Lax` cộng với **antiforgery token** của ASP.NET Core: cookie `XSRF-TOKEN`, frontend gửi lại qua header `X-XSRF-TOKEN` cho mọi request POST, PUT, PATCH, DELETE.
+- Vì token nằm trong **cookie** (credential tự động gửi), vẫn phải chống CSRF: `SameSite=Lax` cộng **antiforgery token** của ASP.NET Core: cookie `XSRF-TOKEN`, frontend gửi lại qua header `X-XSRF-TOKEN` cho mọi request POST, PUT, PATCH, DELETE, **kể cả `/auth/refresh`**.
+- Request xác thực bằng **header `Authorization: Bearer`** (client native) **không** cần antiforgery, vì trình duyệt không tự gửi header này. Middleware chỉ miễn antiforgery khi **không có cookie xác thực** trong request.
 - API chỉ nhận `application/json` (trừ upload multipart ở admin, cũng phải kèm token).
 
 ### 4.3 Authorization theo permission

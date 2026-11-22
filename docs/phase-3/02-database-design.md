@@ -289,3 +289,47 @@ Chi tiết cột và lý do: [08-engagement §12.5](../phase-4/modules/08-engage
 | `engagement.daily_activity` | **Sửa:** thêm `active_seconds` int |
 
 **Vì sao chuyển `saved_entries` sang Engagement?** Đây là dữ liệu **của từng người học**, không phải tri thức dùng chung. Lexicon chỉ nên chứa nội dung đã duyệt, không biết người học nào lưu gì (AR-03).
+
+## 10. [ĐÃ CHỐT – AD-09] Bảng cho phiên JWT và nhật ký bảo mật (schema `identity`)
+
+Thiết kế nghiệp vụ: [01-identity.md §14](../phase-4/modules/01-identity.md).
+
+### 10.1 `identity.refresh_tokens`
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid FK → `identity.users` | |
+| `family_id` | uuid | Một **phiên đăng nhập** = một chuỗi refresh token xoay vòng. Chính là `sid` trong access token |
+| `token_hash` | bytea | SHA-256 của refresh token. **Không bao giờ lưu giá trị gốc** |
+| `created_at`, `last_used_at` | timestamptz | |
+| `idle_expires_at` | timestamptz | Hạn nghỉ, tính lại sau mỗi lần xoay vòng |
+| `absolute_expires_at` | timestamptz | Hạn tuyệt đối của cả chuỗi, **không đổi** giữa các lần xoay |
+| `used_at` | timestamptz null | Đã được đổi lấy token mới lúc nào |
+| `replaced_by_id` | uuid null | Token kế nhiệm |
+| `revoked_at`, `revoked_reason` | timestamptz null, text null | `Logout`, `LogoutAll`, `PasswordChanged`, `ReuseDetected`, `AdminLock`, `AccountDeleted`, `UserRevokedDevice` |
+| `client_kind` | text | `Web` \| `Native` |
+| `remember_me`, `is_admin_session` | bool | Quyết định hạn (bảng 14.4) |
+| `ip_prefix` | text null | IPv4 /24 hoặc IPv6 /48, **đã rút gọn** |
+| `user_agent` | text null | Tối đa 200 ký tự |
+| `device_label` | text null | Ví dụ "Chrome trên Android", suy ra từ user agent |
+
+**Ràng buộc và index:** UQ `token_hash`. IX `family_id`. IX `(user_id)` có điều kiện `revoked_at IS NULL` (liệt kê thiết bị đang đăng nhập). IX `absolute_expires_at` (job dọn). CK `idle_expires_at <= absolute_expires_at`.
+
+**Job dọn:** xóa các dòng có `absolute_expires_at` quá 30 ngày hoặc `revoked_at` quá 30 ngày (giữ lại một thời gian để điều tra).
+
+### 10.2 `identity.auth_events` (nhật ký sự kiện bảo mật)
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| `id` | bigint identity PK | |
+| `user_id` | uuid null | Null khi đăng nhập sai với email không tồn tại |
+| `kind` | text | `LoginSucceeded`, `LoginFailed`, `LockedOut`, `Logout`, `LogoutAll`, `RefreshRotated`, `RefreshReuseDetected`, `PasswordChanged`, `PasswordResetCompleted`, `SessionRevoked`, `ExternalLoginSucceeded`, `AccountDeleted` |
+| `occurred_at` | timestamptz | |
+| `ip_prefix` | text null | Đã rút gọn |
+| `user_agent` | text null | ≤ 200 ký tự |
+| `details` | jsonb null | Thông tin phụ **không bí mật** (ví dụ `familyId`, lý do). Tuyệt đối không chứa mật khẩu, token, email |
+
+IX `(user_id, occurred_at DESC)`, IX `(kind, occurred_at DESC)`. **Giữ 180 ngày** rồi job dọn. Dùng để phát hiện dò mật khẩu và phục vụ điều tra, không dùng để theo dõi hành vi học.
+
+### 10.3 Ghi chú
+- `identity.data_protection_keys` vẫn cần (token xác minh email, đặt lại mật khẩu, antiforgery). Khóa ký JWT **không** nằm trong database mà trong biến môi trường (01-identity §14.8).
+- Quyền riêng tư: `ip_prefix` và `user_agent` thuộc dữ liệu cá nhân. Chúng bị **xóa hoặc ẩn danh** khi xóa tài khoản (qua `IUserDataEraser`, BR-PRIV-02).

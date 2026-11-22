@@ -5,7 +5,7 @@
 
 | File | Nội dung | Đáp ứng yêu cầu |
 |---|---|---|
-| [01-system-architecture.md](01-system-architecture.md) | Kiến trúc tổng thể, backend (modular monolith + vertical slice), frontend, auth (cookie + Google), phân quyền theo permission, lưu file R2, background jobs, xử lý lỗi, logging, bảo mật, deployment + CI/CD + chi phí | Mục 9.3, 13, 14 |
+| [01-system-architecture.md](01-system-architecture.md) | Kiến trúc tổng thể, backend (modular monolith + vertical slice), frontend, auth (JWT access + refresh token, cookie HttpOnly cho web, Google), phân quyền theo permission, lưu file R2, background jobs, xử lý lỗi, logging, bảo mật, deployment + CI/CD + chi phí | Mục 9.3, 13, 14 |
 | [02-database-design.md](02-database-design.md) | Quy ước, ERD, khoảng 50 bảng chia theo 7 schema, ràng buộc, index, chuẩn hóa và phi chuẩn hóa có chủ đích, chiến lược migration, seed | Mục 9.4 |
 | [03-api-design.md](03-api-design.md) | Quy ước REST, phân trang, ProblemDetails, CSRF, endpoint của từng module kèm ví dụ request/response | Mục 9.5 |
 | [04-folder-structure.md](04-folder-structure.md) | Monorepo, 3 project backend, cấu trúc module và slice, cấu trúc Next.js, quy tắc đặt tên, Git | Mục 9.6 |
@@ -19,7 +19,7 @@
 | AR-02 | Trang công khai dùng SSR/ISR (SEO). Trang cần đăng nhập render ở client, nên Next.js không phải giữ phiên đăng nhập |
 | AR-03 | Modular Monolith gồm 7 module, mỗi module một schema. Ranh giới kiểm tra bằng architecture test |
 | AR-04 | Vertical slice + Minimal APIs. Handler được gọi trực tiếp qua DI, không dùng MediatR |
-| AR-05 | Xác thực bằng cookie HttpOnly + antiforgery. Phân quyền theo permission |
+| AR-05 | **(Cập nhật theo AD-09)** Xác thực bằng JWT access token ngắn hạn + refresh token xoay vòng; web truyền bằng cookie `HttpOnly` + antiforgery, native dùng bearer. Phân quyền theo permission |
 | AR-06 | Background job dùng `BackgroundService` + bảng job trong Postgres. Không thêm Hangfire hay Redis |
 | AR-07 | `jsonb` có kiểu (typed) cho thân câu hỏi, khối bài học, bảng chia động từ, snapshot. Dữ liệu dùng chung thì dùng FK |
 | AR-08 | Một VPS chạy Docker Compose. Staging dùng chung VPS. Migration bundle chạy trước khi deploy, không auto-migrate |

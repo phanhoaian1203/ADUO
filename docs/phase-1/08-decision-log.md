@@ -58,9 +58,10 @@ Rule chi tiết: [phase-2/03-business-rules.md](../phase-2/03-business-rules.md)
 | AD-06 | Thêm module **Engagement** (schema `engagement`, schema thứ 8). Cần **migration mới** thêm schema khi làm module này (migration `Init` chỉ tạo 7 schema) và thêm hằng `Schemas.Engagement` trong code | Confirmed (CR-002) |
 | AD-07 | Luyện tập công khai chấm ở client chỉ với bộ câu hỏi `is_public_practice`, tách khỏi ngân hàng đề kiểm tra. Bài kiểm tra cuối cấp luôn chấm ở server | Confirmed (CR-002) |
 | AD-08 | "Ngày học" và streak tính theo múi giờ `Asia/Ho_Chi_Minh`. XP chỉ từ sự kiện server xác nhận | Confirmed (CR-002) |
+| AD-09 | **Xác thực JWT hybrid**: access token 10 phút + refresh token xoay vòng, thu hồi được; web nhận qua cookie HttpOnly, native dùng bearer. **Thay thế** cookie session của AR-05 cũ. Chi tiết ở §9d | Confirmed |
 
 ## 5. Technology Stack (Confirmed)
-.NET 10 LTS · ASP.NET Core Web API · EF Core · PostgreSQL · ASP.NET Core Identity (+ Google login) · Next.js + TypeScript + Tailwind + shadcn/ui · TanStack Query · React Hook Form + Zod · Cloudflare R2 · Azure TTS (de-DE) · Docker · GitHub Actions · Serilog · Sentry.
+.NET 10 LTS · ASP.NET Core Web API · EF Core · PostgreSQL · ASP.NET Core Identity (quản lý người dùng, Google login) + **JWT access/refresh token (AD-09)** · Next.js + TypeScript + Tailwind + shadcn/ui · TanStack Query · React Hook Form + Zod · Cloudflare R2 · Azure TTS (de-DE) · Docker · GitHub Actions · Serilog · Sentry.
 
 ## 6. Database / API / Naming Conventions
 Đã chốt ở Phase 3 (Confirmed 2026-11-22):
@@ -132,6 +133,27 @@ Tài liệu: [CR-003](../change-requests/CR-003-personalization-from-brottin.md)
 | Q-CR3-01 | Phạm vi vào MVP | **Phương án 2**: toàn bộ tầng A (chế độ học từ, thẻ giàu thông tin, cài đặt cá nhân hóa, Lưu từ + Từ của tôi, phím tắt, nhãn AI), +12–14 ngày. Giữ **điểm kiểm tra** sau Identity + ContentOps 2a + Lexicon | ✅ **Confirmed** |
 | Q-CR3-02 | Thử xin phép Brottin bằng văn bản | Có, bạn tự gửi, không phụ thuộc câu trả lời | ⏳ Chưa trả lời. Việc của chủ dự án, không chặn tiến độ |
 | Q-CR3-03 | V2: cho phép gửi **một từ + cấp độ** lên API AI (sửa BR-PRIV-03) | Đồng ý, chỉ ở V2 | ⏳ Quyết ở V2 |
+
+
+## 9d. AD-09 – Xác thực: JWT hybrid (Confirmed 2026-11-22)
+
+**Bối cảnh:** thiết kế ban đầu (AR-05) dùng cookie session. Chủ dự án muốn dùng JWT và ưu tiên một phương án **an toàn, dùng được lâu dài**, không chỉ nhanh cho MVP, và nhờ tôi chọn hướng hợp lý.
+
+| ID | Quyết định | Trạng thái |
+|---|---|---|
+| **AD-09** | **JWT access token (10 phút) + refresh token xoay vòng có phát hiện dùng lại.** Web nhận token qua cookie `HttpOnly`; client native sau này dùng `Authorization: Bearer`. ASP.NET Core Identity chỉ dùng để quản lý người dùng (mật khẩu, khóa tạm, token email, Google, SecurityStamp), **không** dùng cookie đăng nhập của nó. **Thay thế** phần cookie session của AR-05 cũ | **Confirmed** |
+
+**Thiết kế chi tiết:** [01-identity.md §14](../phase-4/modules/01-identity.md). Các điểm chính:
+- Refresh token lưu **băm SHA-256**, xoay vòng mỗi lần dùng, dùng lại ngoài ân hạn 10 giây thì **thu hồi cả chuỗi**.
+- Thu hồi ≤ 60 giây (học viên), **tức thì** (Admin và hành động nhạy cảm).
+- Hạn tuyệt đối của phiên (90 ngày khi "Ghi nhớ", 7 ngày khi không). **Admin:** tối đa 12 giờ, không "Ghi nhớ".
+- "Thiết bị đăng nhập", "Đăng xuất mọi thiết bị", nhật ký sự kiện bảo mật (IP rút gọn, giữ 180 ngày).
+- Khóa ký trong biến môi trường, có `kid`, có quy trình xoay khóa.
+- Vẫn chống CSRF (antiforgery) vì token nằm trong cookie.
+
+**Đánh đổi đã chấp nhận:** Identity tăng từ 6–8 lên **11–15 ngày công**, tổng MVP khoảng **93–126**. Phức tạp hơn cookie session, bù lại bằng bộ test dày (ID-T24..45). Khi chạy nhiều instance, bộ đệm thu hồi phải chuyển sang Redis (ghi quyết định lúc đó).
+
+**Điều kiện xem lại AD-09:** có app mobile native hoặc API bên thứ ba (bật `/auth/token`), hoặc chạy nhiều instance.
 
 ## 10. Known Issues / Open Verification
 Xem [04-license-assessment.md §5](04-license-assessment.md). Các trang chưa đọc được trực tiếp:

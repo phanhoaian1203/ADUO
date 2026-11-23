@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./providers";
 import { strings } from "@/lib/strings";
 import "./globals.css";
 
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="vi" className={`${beVietnam.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        {children}
+        <Providers>{children}</Providers>
         <Toaster position="top-center" />
       </body>
     </html>

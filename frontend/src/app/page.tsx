@@ -1,3 +1,4 @@
+import { AuthNav } from "@/features/identity/components/AuthNav";
 import { ApiStatus } from "@/features/system/components/ApiStatus";
 import { strings } from "@/lib/strings";
 
@@ -10,6 +11,8 @@ export default function Home() {
         <h1 className="text-3xl font-semibold tracking-tight">{strings.app.name}</h1>
         <p className="mt-2 text-muted-foreground">{strings.app.tagline}</p>
       </header>
+
+      <AuthNav />
 
       <section aria-labelledby="status-title" className="flex flex-col gap-3">
         <h2 id="status-title" className="text-lg font-semibold">

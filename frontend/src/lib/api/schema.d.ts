@@ -804,6 +804,816 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/attributions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AttributionItem"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/licenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LicenseResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SourceResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateSourceRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SourceResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateSourceRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SourceResponse"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SettingResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateSettingsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SettingResponse"][];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    kind?: components["schemas"]["MediaKind"];
+                    search?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MediaPage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UploadResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/media/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | string;
+                    pageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportBatchResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportBatchResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/content-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/templates/{contentType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    format?: string;
+                };
+                header?: never;
+                path: {
+                    contentType: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportBatchResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/{id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportBatchResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportBatchResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/review-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    type?: components["schemas"]["ContentKind"];
+                    origin?: components["schemas"]["ContentOrigin"];
+                    flagged?: boolean;
+                    sourceId?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReviewQueuePage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/{resource}/{id}/submit-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resource: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LifecycleRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContentActionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/{resource}/{id}/return-to-draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resource: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LifecycleRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContentActionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/{resource}/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resource: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LifecycleRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContentActionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/{resource}/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resource: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PublishRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContentActionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/review-queue/publish-batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BatchPublishRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BatchPublishOutcome"][];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -819,14 +1629,77 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        AttributionItem: {
+            /** Format: uuid */
+            sourceId: string;
+            name: string;
+            provider: null | string;
+            url: null | string;
+            licenseCode: string;
+            licenseName: string;
+            licenseUrl: null | string;
+            requiresAttribution: boolean;
+            shareAlike: boolean;
+            /** Format: int32 */
+            publishedCount: number | string;
+        };
+        BatchPublishItem: {
+            resource: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            version: number | string;
+        };
+        BatchPublishOutcome: {
+            resource: string;
+            /** Format: uuid */
+            id: string;
+            published: boolean;
+            code: null | string;
+            reasons: null | string[];
+        };
+        BatchPublishRequest: {
+            items: null | components["schemas"]["BatchPublishItem"][];
+            checklist: null | components["schemas"]["ChecklistRequest"];
+        };
         ChangePasswordRequest: {
             currentPassword: null | string;
             newPassword: null | string;
+        };
+        ChecklistRequest: {
+            sourceAndLicenseCorrect: boolean;
+            contentAccurate: boolean;
+            levelAppropriate: boolean;
+            vietnameseNatural: boolean;
+            mediaPlayable: boolean;
+            flagsReviewed: boolean;
         };
         ConfirmEmailRequest: {
             /** Format: uuid */
             userId: string;
             token: null | string;
+        };
+        ContentActionResponse: {
+            resource: string;
+            /** Format: uuid */
+            id: string;
+            status: components["schemas"]["ContentStatus"];
+            /** Format: int32 */
+            version: number | string;
+        };
+        /** @enum {unknown} */
+        ContentKind: "Vocabulary" | "ExampleSentence" | "Grammar" | "Topic" | "Lesson" | "Question" | "Article";
+        /** @enum {unknown} */
+        ContentOrigin: "Imported" | "HumanAuthored" | "AIDraft" | "AIDraftHumanEdited";
+        /** @enum {unknown} */
+        ContentStatus: "Draft" | "InReview" | "Published" | "NeedsUpdate" | "Archived";
+        CreateSourceRequest: {
+            name: null | string;
+            provider: null | string;
+            url: null | string;
+            /** Format: int16 */
+            defaultLicenseId: number | string;
+            notes: null | string;
         };
         DeleteAccountRequest: {
             password: null | string;
@@ -844,13 +1717,100 @@ export interface components {
                 [key: string]: string;
             };
         };
+        ImportBatchResponse: {
+            /** Format: uuid */
+            id: string;
+            contentType: string;
+            /** Format: uuid */
+            sourceId: string;
+            status: components["schemas"]["ImportBatchStatus"];
+            report: components["schemas"]["ImportReport"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            committedAt: null | string;
+        };
+        /** @enum {unknown} */
+        ImportBatchStatus: "DryRun" | "Committed" | "Cancelled";
+        ImportDuplicate: {
+            /** Format: int32 */
+            row: number | string;
+            key: string;
+            existingId: null | string;
+            where: string;
+        };
+        ImportReport: {
+            /** Format: int32 */
+            total?: number | string;
+            /** Format: int32 */
+            valid?: number | string;
+            errors?: components["schemas"]["ImportRowError"][];
+            duplicates?: components["schemas"]["ImportDuplicate"][];
+            /** Format: int32 */
+            inserted?: null | number | string;
+            /** Format: int32 */
+            deleted?: null | number | string;
+            /** Format: int32 */
+            keptPublished?: null | number | string;
+        };
+        ImportRowError: {
+            /** Format: int32 */
+            row: number | string;
+            field: string;
+            message: string;
+        };
         /** @enum {unknown} */
         LearningPurpose: "Ausbildung" | "Nursing" | "Recognition" | "Study" | "Other" | null;
+        LicenseResponse: {
+            /** Format: int16 */
+            id: number | string;
+            code: string;
+            name: string;
+            url: null | string;
+            allowsCommercial: boolean;
+            requiresAttribution: boolean;
+            shareAlike: boolean;
+            allowsModification: boolean;
+        };
+        LifecycleRequest: {
+            /** Format: int32 */
+            version: number | string;
+            note?: null | string;
+        };
         LoginRequest: {
             email: null | string;
             password: null | string;
             /** @default false */
             rememberMe: boolean;
+        };
+        /** @enum {unknown} */
+        MediaKind: "Audio" | "Image" | "ImportFile";
+        MediaPage: {
+            items: components["schemas"]["MediaResponse"][];
+            /** Format: int32 */
+            total: number | string;
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+        };
+        MediaResponse: {
+            /** Format: uuid */
+            id: string;
+            kind: components["schemas"]["MediaKind"];
+            contentType: string;
+            fileName: null | string;
+            /** Format: int64 */
+            sizeBytes: number | string;
+            checksum: string;
+            /** Format: uuid */
+            sourceId: string;
+            /** Format: int16 */
+            licenseId: number | string;
+            attribution: null | string;
+            originalUrl: null | string;
+            /** Format: date-time */
+            createdAt: string;
         };
         MeResponse: {
             /** Format: uuid */
@@ -865,6 +1825,11 @@ export interface components {
             avatarMediaId: null | string;
             permissions: string[];
             isAdmin: boolean;
+        };
+        PublishRequest: {
+            /** Format: int32 */
+            version: number | string;
+            checklist: null | components["schemas"]["ChecklistRequest"];
         };
         RegisterRequest: {
             displayName: null | string;
@@ -881,6 +1846,32 @@ export interface components {
             token: null | string;
             newPassword: null | string;
         };
+        ReviewQueueItem: {
+            resource: string;
+            kind: components["schemas"]["ContentKind"];
+            /** Format: uuid */
+            id: string;
+            title: string;
+            status: components["schemas"]["ContentStatus"];
+            origin: components["schemas"]["ContentOrigin"];
+            /** Format: uuid */
+            sourceId: string;
+            /** Format: int32 */
+            version: number | string;
+            /** Format: date-time */
+            updatedAt: string;
+            flags: string[];
+            flagged?: boolean;
+        };
+        ReviewQueuePage: {
+            items: components["schemas"]["ReviewQueueItem"][];
+            /** Format: int32 */
+            total: number | string;
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+        };
         SessionResponse: {
             /** Format: uuid */
             id: string;
@@ -892,6 +1883,34 @@ export interface components {
             lastUsedAt: string;
             current: boolean;
         };
+        SettingResponse: {
+            key: string;
+            /** Format: double */
+            value: number | string;
+            /** Format: double */
+            default: number | string;
+            /** Format: double */
+            min: number | string;
+            /** Format: double */
+            max: number | string;
+            description: string;
+        };
+        SourceResponse: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            provider: null | string;
+            url: null | string;
+            /** Format: int16 */
+            defaultLicenseId: number | string;
+            licenseCode: string;
+            licenseAllowsCommercial: boolean;
+            /** Format: date-time */
+            licenseVerifiedAt: null | string;
+            notes: null | string;
+            isActive: boolean;
+            blocksPublishing: boolean;
+        };
         /** @enum {unknown} */
         TargetLevel: "A1" | "A2" | "B1" | null;
         UpdateProfileRequest: {
@@ -900,6 +1919,25 @@ export interface components {
             targetLevel: null | components["schemas"]["TargetLevel"];
             /** Format: uuid */
             avatarMediaId: null | string;
+        };
+        UpdateSettingsRequest: {
+            values: null | {
+                [key: string]: number | string;
+            };
+        };
+        UpdateSourceRequest: {
+            name: null | string;
+            provider: null | string;
+            url: null | string;
+            /** Format: int16 */
+            defaultLicenseId: null | number | string;
+            notes: null | string;
+            isActive: null | boolean;
+            licenseVerified: null | boolean;
+        };
+        UploadResponse: {
+            media: components["schemas"]["MediaResponse"];
+            reused: boolean;
         };
     };
     responses: never;

@@ -1,5 +1,7 @@
 # Module 2 – ContentOps (vận hành nội dung)
 
+> **[TRẠNG THÁI TRIỂN KHAI – 2026-11-23]** Đợt **2a (lõi) đã xong**: License/Source/Media/Settings/Attribution, vòng đời + PublishGuard, khung import (dry-run, commit, hủy), hàng đợi duyệt + checklist + lịch sử phiên bản, giao diện Admin. CO-T01..13, 19, 20, 21, 22 có test (CO-T21/22 ở mức `ContentMeta.AiAssisted`). **Chưa có entity/importer thật** nên import và vòng đời được kiểm thử bằng loại nội dung giả; sẽ kiểm chứng thật ở Lexicon. **Đợt 2b chưa làm:** AI, TTS, báo lỗi (CO-T14..18), dashboard. Các điều chỉnh so với thiết kế: [decision log §7](../../phase-1/08-decision-log.md).
+
 > ContentOps là "nhà máy nội dung" của nền tảng. Nó trả lời ba câu hỏi cho **mọi** mẩu nội dung: *từ đâu ra?*, *có được phép dùng không?*, *đã được kiểm tra chưa?*. Vì bạn làm một mình và không có người duyệt (Q4), module này chính là **lưới an toàn chất lượng** của dự án.
 
 Module được triển khai làm hai đợt:

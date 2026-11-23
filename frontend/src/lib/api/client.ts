@@ -143,3 +143,22 @@ export type ApiProblem = {
   traceId?: string;
   errors?: Record<string, string[]>;
 };
+
+/**
+ * Gửi form multipart (upload file). openapi-fetch chưa mô tả tốt multipart nên dùng fetch trực tiếp,
+ * vẫn gắn X-XSRF-TOKEN và tự làm mới token một lần nếu access token hết hạn (giống các request khác).
+ * Trình duyệt tự đặt Content-Type kèm boundary, nên KHÔNG tự đặt header này.
+ */
+export async function postForm(url: string, form: FormData): Promise<Response> {
+  const send = async () => {
+    await ensureCsrf();
+    const token = readCookie("XSRF-TOKEN");
+    return fetch(url, { method: "POST", body: form, credentials: "include", headers: token ? { "X-XSRF-TOKEN": token } : {} });
+  };
+  let res = await send();
+  if (res.status === 401 && hasSignedInHint()) {
+    const problem = await res.clone().json().catch(() => null);
+    if (problem && RETRYABLE_CODES.has(problem.code) && (await refreshOnce())) res = await send();
+  }
+  return res;
+}

@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api/client";
 import { asProblem, problemMessage } from "@/lib/api/problem";
 import { strings } from "@/lib/strings";
+import { AdminShell } from "@/features/content/components/AdminShell";
 import { useMe } from "../hooks";
 
 const t = strings.admin;
@@ -53,8 +54,7 @@ export function AdminUsers() {
   if (!me.isAdmin) return <p className="mx-auto mt-10 max-w-2xl px-4">{t.forbidden}</p>;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">{t.usersTitle}</h1>
+    <AdminShell current="users" title={t.usersTitle}>
       <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.search} aria-label={t.search} />
       {isLoading ? <Skeleton className="h-32 w-full" /> : null}
       {error ? <p className="text-sm text-destructive">{strings.common.genericError}</p> : null}
@@ -76,6 +76,6 @@ export function AdminUsers() {
           </li>
         ))}
       </ul>
-    </main>
+    </AdminShell>
   );
 }

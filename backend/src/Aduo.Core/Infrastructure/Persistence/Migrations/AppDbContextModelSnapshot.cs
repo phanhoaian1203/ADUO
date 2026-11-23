@@ -24,6 +24,520 @@ namespace Aduo.Core.Infrastructure.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.AppSetting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("key");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key")
+                        .HasName("pk_app_settings");
+
+                    b.ToTable("app_settings", "content");
+
+                    b.HasData(
+                        new
+                        {
+                            Key = "lesson.passThresholdPct",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "60"
+                        },
+                        new
+                        {
+                            Key = "exam.graceSeconds",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "30"
+                        },
+                        new
+                        {
+                            Key = "reports.maxPerDay",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "10"
+                        },
+                        new
+                        {
+                            Key = "budget.monthlyUsd",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "10"
+                        },
+                        new
+                        {
+                            Key = "infohub.reviewMonths.default",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "6"
+                        },
+                        new
+                        {
+                            Key = "infohub.reviewMonths.Ausbildung",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "3"
+                        });
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.ContentRevision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ChangeNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("change_note");
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<Guid?>("ChangedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("changed_by");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<string>("Snapshot")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("snapshot");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id")
+                        .HasName("pk_content_revisions");
+
+                    b.HasIndex("EntityType", "EntityId", "Version")
+                        .IsDescending(false, false, true)
+                        .HasDatabaseName("ix_content_revisions_entity");
+
+                    b.ToTable("content_revisions", "content");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.ImportBatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CommittedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("committed_at");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<Guid>("FileMediaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_media_id");
+
+                    b.Property<string>("Report")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("report");
+
+                    b.Property<Guid>("SourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id")
+                        .HasName("pk_import_batches");
+
+                    b.HasIndex("CreatedAt")
+                        .IsDescending()
+                        .HasDatabaseName("ix_import_batches_created");
+
+                    b.HasIndex("FileMediaId")
+                        .HasDatabaseName("ix_import_batches_file_media_id");
+
+                    b.HasIndex("SourceId")
+                        .HasDatabaseName("ix_import_batches_source_id");
+
+                    b.ToTable("import_batches", "content");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.License", b =>
+                {
+                    b.Property<short>("Id")
+                        .HasColumnType("smallint")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("AllowsCommercial")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allows_commercial");
+
+                    b.Property<bool>("AllowsModification")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allows_modification");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("code");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("name");
+
+                    b.Property<bool>("RequiresAttribution")
+                        .HasColumnType("boolean")
+                        .HasColumnName("requires_attribution");
+
+                    b.Property<bool>("ShareAlike")
+                        .HasColumnType("boolean")
+                        .HasColumnName("share_alike");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("pk_licenses");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ux_licenses_code");
+
+                    b.ToTable("licenses", "content");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = (short)1,
+                            AllowsCommercial = true,
+                            AllowsModification = true,
+                            Code = "CC-BY-SA-4.0",
+                            Name = "Creative Commons Attribution-ShareAlike 4.0",
+                            RequiresAttribution = true,
+                            ShareAlike = true,
+                            Url = "https://creativecommons.org/licenses/by-sa/4.0/"
+                        },
+                        new
+                        {
+                            Id = (short)2,
+                            AllowsCommercial = true,
+                            AllowsModification = true,
+                            Code = "CC-BY-2.0-FR",
+                            Name = "Creative Commons Attribution 2.0 France",
+                            RequiresAttribution = true,
+                            ShareAlike = false,
+                            Url = "https://creativecommons.org/licenses/by/2.0/fr/"
+                        },
+                        new
+                        {
+                            Id = (short)3,
+                            AllowsCommercial = true,
+                            AllowsModification = true,
+                            Code = "CC0-1.0",
+                            Name = "Creative Commons Zero 1.0 (public domain)",
+                            RequiresAttribution = false,
+                            ShareAlike = false,
+                            Url = "https://creativecommons.org/publicdomain/zero/1.0/"
+                        },
+                        new
+                        {
+                            Id = (short)4,
+                            AllowsCommercial = true,
+                            AllowsModification = true,
+                            Code = "Proprietary",
+                            Name = "Độc quyền (nội dung của ADUO hoặc theo điều khoản nhà cung cấp)",
+                            RequiresAttribution = false,
+                            ShareAlike = false
+                        },
+                        new
+                        {
+                            Id = (short)5,
+                            AllowsCommercial = false,
+                            AllowsModification = true,
+                            Code = "CC-BY-NC-4.0",
+                            Name = "Creative Commons Attribution-NonCommercial 4.0 (KHÔNG dùng thương mại)",
+                            RequiresAttribution = true,
+                            ShareAlike = false,
+                            Url = "https://creativecommons.org/licenses/by-nc/4.0/"
+                        });
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.MediaAsset", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Attribution")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("attribution");
+
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("bucket");
+
+                    b.Property<string>("ChecksumSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("checksum_sha256");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("DurationMs")
+                        .HasColumnType("integer")
+                        .HasColumnName("duration_ms");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("kind");
+
+                    b.Property<string>("OriginalFileName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("original_file_name");
+
+                    b.Property<string>("OriginalUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("original_url");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("storage_key");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UploadedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uploaded_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_media");
+
+                    b.HasIndex("ChecksumSha256")
+                        .HasDatabaseName("ix_media_checksum");
+
+                    b.HasIndex("StorageKey")
+                        .IsUnique()
+                        .HasDatabaseName("ux_media_storage_key");
+
+                    b.HasIndex("Kind", "CreatedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_media_kind_created");
+
+                    b.ToTable("media", "content");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.ReviewChecklistRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<string>("Items")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("items");
+
+                    b.Property<DateTimeOffset>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reviewed_at");
+
+                    b.Property<Guid>("ReviewedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reviewed_by");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id")
+                        .HasName("pk_review_checklists");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("ix_review_checklists_entity");
+
+                    b.ToTable("review_checklists", "content");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.Source", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<short>("DefaultLicenseId")
+                        .HasColumnType("smallint")
+                        .HasColumnName("default_license_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTimeOffset?>("LicenseVerifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("license_verified_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("provider");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sources");
+
+                    b.HasIndex("DefaultLicenseId")
+                        .HasDatabaseName("ix_sources_default_license_id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ux_sources_name");
+
+                    b.ToTable("sources", "content");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("0193b000-0000-7000-8000-000000000001"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DefaultLicenseId = (short)1,
+                            IsActive = true,
+                            Name = "Wiktionary (kaikki.org)",
+                            Notes = "Dữ liệu CC BY-SA: bản dịch và biến đổi vẫn là CC BY-SA, phải ghi công trên UI (BR-CNT-04).",
+                            Provider = "Wiktionary / kaikki.org",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Url = "https://kaikki.org"
+                        },
+                        new
+                        {
+                            Id = new Guid("0193b000-0000-7000-8000-000000000002"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DefaultLicenseId = (short)2,
+                            IsActive = true,
+                            Name = "Tatoeba",
+                            Notes = "Phần lớn câu CC BY 2.0 FR; một số câu CC0. Kiểm tra từng câu khi import.",
+                            Provider = "Tatoeba",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Url = "https://tatoeba.org"
+                        },
+                        new
+                        {
+                            Id = new Guid("0193b000-0000-7000-8000-000000000003"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DefaultLicenseId = (short)4,
+                            IsActive = true,
+                            Name = "ADUO (tự biên soạn)",
+                            Provider = "ADUO",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("0193b000-0000-7000-8000-000000000004"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DefaultLicenseId = (short)4,
+                            IsActive = true,
+                            Name = "Azure TTS",
+                            Notes = "⚖️ Chưa xác minh điều khoản lưu và phát lại audio tổng hợp. Xác minh trước khi dùng audio thật.",
+                            Provider = "Microsoft Azure",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 11, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
+                });
+
             modelBuilder.Entity("Aduo.Core.Modules.Identity.Domain.AppRole", b =>
                 {
                     b.Property<Guid>("Id")
@@ -544,6 +1058,127 @@ namespace Aduo.Core.Infrastructure.Persistence.Migrations
                         .HasName("pk_user_tokens");
 
                     b.ToTable("user_tokens", "identity");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.ImportBatch", b =>
+                {
+                    b.HasOne("Aduo.Core.Modules.ContentOps.Domain.MediaAsset", null)
+                        .WithMany()
+                        .HasForeignKey("FileMediaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_import_batches_media_assets_file_media_id");
+
+                    b.HasOne("Aduo.Core.Modules.ContentOps.Domain.Source", null)
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_import_batches_sources_source_id");
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.MediaAsset", b =>
+                {
+                    b.OwnsOne("Aduo.Core.Common.Content.ContentMeta", "Meta", b1 =>
+                        {
+                            b1.Property<Guid>("MediaAssetId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("AiModel")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("ai_model");
+
+                            b1.Property<Guid?>("ImportBatchId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("import_batch_id");
+
+                            b1.Property<short>("LicenseId")
+                                .HasColumnType("smallint")
+                                .HasColumnName("license_id");
+
+                            b1.Property<string>("Origin")
+                                .IsRequired()
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)")
+                                .HasColumnName("origin");
+
+                            b1.Property<string>("OriginalRef")
+                                .HasMaxLength(300)
+                                .HasColumnType("character varying(300)")
+                                .HasColumnName("original_ref");
+
+                            b1.Property<Guid?>("PromptTemplateId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("prompt_template_id");
+
+                            b1.Property<DateTimeOffset?>("PublishedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("published_at");
+
+                            b1.Property<DateTimeOffset?>("ReviewedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("reviewed_at");
+
+                            b1.Property<Guid?>("ReviewedBy")
+                                .HasColumnType("uuid")
+                                .HasColumnName("reviewed_by");
+
+                            b1.Property<Guid>("SourceId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("source_id");
+
+                            b1.Property<string>("Status")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)")
+                                .HasColumnName("status");
+
+                            b1.HasKey("MediaAssetId");
+
+                            b1.HasIndex("LicenseId")
+                                .HasDatabaseName("ix_media_license_id");
+
+                            b1.HasIndex("SourceId")
+                                .HasDatabaseName("ix_media_source_id");
+
+                            b1.HasIndex("Status")
+                                .HasDatabaseName("ix_mediaasset_status");
+
+                            b1.ToTable("media", "content");
+
+                            b1.HasOne("Aduo.Core.Modules.ContentOps.Domain.License", null)
+                                .WithMany()
+                                .HasForeignKey("LicenseId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired()
+                                .HasConstraintName("fk_media_licenses_license_id");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MediaAssetId")
+                                .HasConstraintName("fk_media_media_id");
+
+                            b1.HasOne("Aduo.Core.Modules.ContentOps.Domain.Source", null)
+                                .WithMany()
+                                .HasForeignKey("SourceId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired()
+                                .HasConstraintName("fk_media_sources_source_id");
+                        });
+
+                    b.Navigation("Meta")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Aduo.Core.Modules.ContentOps.Domain.Source", b =>
+                {
+                    b.HasOne("Aduo.Core.Modules.ContentOps.Domain.License", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultLicenseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_sources_licenses_default_license_id");
                 });
 
             modelBuilder.Entity("Aduo.Core.Modules.Identity.Domain.RefreshToken", b =>

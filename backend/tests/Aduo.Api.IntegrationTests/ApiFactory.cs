@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using Aduo.Core.Common.Content;
 using Aduo.Core.Infrastructure.Email;
+using Aduo.Core.Modules.ContentOps.Import;
 using Aduo.Core.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -26,6 +28,10 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     public CapturingEmailSender Emails { get; } = new();
 
+    public FakeContentResource Content { get; } = new();
+
+    private readonly string _storageDir = Path.Combine(Path.GetTempPath(), "aduo-test-storage-" + Guid.NewGuid().ToString("N"));
+
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();
@@ -39,12 +45,17 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         await base.DisposeAsync();
         await _postgres.DisposeAsync();
+        if (Directory.Exists(_storageDir))
+        {
+            Directory.Delete(_storageDir, recursive: true);
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
         builder.UseSetting("ConnectionStrings:Aduo", _postgres.GetConnectionString());
+        builder.UseSetting("Storage:LocalPath", _storageDir);
 
         builder.ConfigureServices(services =>
         {
@@ -52,6 +63,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             services.AddSingleton<TimeProvider>(Time);
             services.RemoveAll<IEmailSender>();
             services.AddSingleton<IEmailSender>(Emails);
+            services.AddSingleton<IContentResource>(Content);
+            services.AddScoped<IImportHandler, FakeImportHandler>();
         });
     }
 }

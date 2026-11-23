@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Aduo.Api.Middleware;
 using Aduo.Api.Setup;
 using Aduo.Core;
+using Aduo.Core.Modules.ContentOps;
+using Aduo.Core.Modules.ContentOps.Features;
 using Aduo.Core.Modules.Identity;
 using Aduo.Core.Modules.Identity.Auth;
 using Aduo.Core.Modules.Identity.Features;
@@ -43,6 +45,7 @@ builder.Host.UseSerilog((context, services, config) =>
 // ── Services ───────────────────────────────────────────────────────────────────────
 builder.Services.AddAduoCore(builder.Configuration);
 builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddContentOpsModule(builder.Configuration);
 
 // ── Đăng nhập Google: chỉ bật khi đã cấu hình ClientId/ClientSecret (user-secrets ở dev, biến môi trường ở production) ──
 var googleSection = builder.Configuration.GetSection("Authentication:Google");
@@ -108,6 +111,7 @@ app.UseAuthorization();
 // ── Endpoints ──────────────────────────────────────────────────────────────────────
 app.MapAduoHealthChecks();
 app.MapIdentityEndpoints();
+app.MapContentOpsEndpoints();
 
 if (!app.Environment.IsProduction())
 {

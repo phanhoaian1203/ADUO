@@ -228,22 +228,8 @@ public static class IdentityEndpoints
 
     private static void MapAdmin(RouteGroupBuilder g)
     {
-        // Admin: kiểm tra phiên trực tiếp trong DB (không đệm) + yêu cầu đăng nhập trong vòng 12 giờ (BR-AUTH-13, 15).
-        g.RequireAuthorization(Permissions.UsersManage)
-            .WithMetadata(new FreshSessionMetadata())
-            .AddEndpointFilter(async (ctx, next) =>
-            {
-                var opt = ctx.HttpContext.RequestServices.GetRequiredService<IOptions<AuthOptions>>().Value;
-                var time = ctx.HttpContext.RequestServices.GetRequiredService<TimeProvider>();
-                var authTime = ctx.HttpContext.User.FindFirstValue(AduoClaims.AuthTime);
-                if (!long.TryParse(authTime, out var seconds)
-                    || time.GetUtcNow() - DateTimeOffset.FromUnixTimeSeconds(seconds) > TimeSpan.FromHours(opt.AdminReauthHours))
-                {
-                    return AuthErrors.ReauthRequired.ToProblem();
-                }
-
-                return await next(ctx);
-            });
+        // Admin: quyền users.manage + phiên kiểm tra trực tiếp + yêu cầu đăng nhập lại sau 12 giờ (xem AdminGroupExtensions).
+        g.RequireAdmin(Permissions.UsersManage);
 
         g.MapGet("", async (AdminUserHandlers h, string? q, int? page, int? pageSize, CancellationToken ct)
             => Results.Ok(await h.ListAsync(q, page ?? 1, Math.Clamp(pageSize ?? 20, 1, 100), ct))).Produces<IReadOnlyList<AdminUserResponse>>();

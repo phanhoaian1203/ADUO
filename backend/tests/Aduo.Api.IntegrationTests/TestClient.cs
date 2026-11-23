@@ -1,7 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Aduo.Core.Common.Security;
+using Aduo.Core.Modules.Identity.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Aduo.Api.IntegrationTests;
 
@@ -43,7 +47,11 @@ public sealed class TestClient
         bool sendCookies = true)
     {
         var req = new HttpRequestMessage(method, url);
-        if (body is not null)
+        if (body is HttpContent raw)
+        {
+            req.Content = raw;
+        }
+        else if (body is not null)
         {
             req.Content = JsonContent.Create(body);
         }
@@ -143,6 +151,28 @@ public static class TestUsers
         var email = NewEmail();
         var res = await client.PostAsync("/api/v1/auth/register", Register(email));
         Assert.Equal(HttpStatusCode.Created, res.StatusCode);
+        return (client, email);
+    }
+}
+
+public static class TestAdmins
+{
+    /// <summary>Tạo một Admin (có đủ quyền) rồi đăng nhập, trả client đã có cookie.</summary>
+    public static async Task<(TestClient Client, string Email)> SignedInAdminAsync(ApiFactory factory)
+    {
+        var email = TestUsers.NewEmail();
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            var user = new AppUser { UserName = email, Email = email, EmailConfirmed = true, DisplayName = "Quản trị", CreatedAt = DateTimeOffset.UtcNow };
+            Assert.True((await users.CreateAsync(user, TestUsers.Password)).Succeeded);
+            Assert.True((await users.AddToRoleAsync(user, Roles.Admin)).Succeeded);
+        }
+
+        var client = new TestClient(factory);
+        await client.EnsureCsrfAsync();
+        var login = await client.PostAsync("/api/v1/auth/login", new { email, password = TestUsers.Password });
+        Assert.Equal(System.Net.HttpStatusCode.OK, login.StatusCode);
         return (client, email);
     }
 }

@@ -22,6 +22,9 @@ next-env.d.ts
 appsettings.*.local.json
 secrets.json
 
+# File upload ở máy dev (kho local của ContentOps): không commit
+backend/src/Aduo.Api/storage/
+
 # Dữ liệu thô quá lớn (dump Wiktionary…): tải riêng, không commit
 data/raw/
 

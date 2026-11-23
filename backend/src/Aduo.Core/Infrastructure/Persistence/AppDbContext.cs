@@ -1,3 +1,4 @@
+using Aduo.Core.Modules.ContentOps.Domain;
 using Aduo.Core.Modules.Identity.Domain;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -23,6 +24,20 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public DbSet<AuthEvent> AuthEvents => Set<AuthEvent>();
+
+    public DbSet<License> Licenses => Set<License>();
+
+    public DbSet<Source> Sources => Set<Source>();
+
+    public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
+
+    public DbSet<ImportBatch> ImportBatches => Set<ImportBatch>();
+
+    public DbSet<ContentRevision> ContentRevisions => Set<ContentRevision>();
+
+    public DbSet<ReviewChecklistRecord> ReviewChecklists => Set<ReviewChecklistRecord>();
+
+    public DbSet<AppSetting> AppSettings => Set<AppSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

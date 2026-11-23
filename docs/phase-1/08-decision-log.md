@@ -74,6 +74,19 @@ Rule chi tiết: [phase-2/03-business-rules.md](../phase-2/03-business-rules.md)
 - Phase 2: Confirmed. **Cập nhật v2 theo CR-001** ngày 2026-11-22.
 - Phase 3 – Architecture & UI/UX: **Confirmed** 2026-11-22. Tiếp theo: Phase 4 – MVP Development ([docs/phase-3](../phase-3/00-README.md)).
 - Phase 4 – Bước 1 **Foundation: xong và đã xác minh đầy đủ, chưa commit** (2026-11-22). 51 test pass (39 unit, 3 architecture, 9 integration). Migration `Init` đã áp dụng được lên PostgreSQL 17 thật (7 schema + `pg_trgm`, `unaccent`), rollback về 0 rồi áp dụng lại đều chạy đúng. Trang web hiển thị "API: OK" và "Cơ sở dữ liệu: OK" qua proxy cùng origin.
+- Phase 4 – Bước 2 **Identity: backend và frontend cốt lõi xong và đã xác minh, chưa commit** (2026-11-23). **87 test pass** (39 unit, 3 architecture, 45 integration; trong đó 36 test Identity chạy trên PostgreSQL thật qua Testcontainers). Migration `Identity_Init` áp dụng được lên PostgreSQL 17 (11 bảng schema `identity`, seed 2 vai trò). Đã thử tay trên trình duyệt: đăng ký → chọn mục tiêu → xác minh email qua link → đăng nhập → token hết hạn tự làm mới (`GET /me` 401 → `POST /auth/refresh` 204 → thử lại 200). `npm run lint`, `typecheck`, `build` đều sạch.
+  - **Chưa làm (cần bổ sung trước khi đóng module):** đăng nhập Google (ID-T12..14, ID-T45; **cần chủ dự án tạo Google OAuth Client ID/Secret**), khách chơi thử và gộp tiến độ khi đăng ký (ID-T21, T22; thuộc luồng Engagement), onboarding bước "số phút học mỗi ngày" (ID-T23), test xoay khóa ký (ID-T40), cổng chặn endpoint `assessment.take` (ID-T17 hiện kiểm tra qua danh sách quyền ở `/me` vì module Assessment chưa có), thử trên điện thoại thật, grep log kiểm tra không lộ bí mật.
+
+### Điều chỉnh so với thiết kế khi code Identity
+| Thay đổi | Lý do |
+|---|---|
+| **CSRF dùng double-submit cookie tự viết** (`XSRF-TOKEN` = header `X-XSRF-TOKEN`), không dùng `IAntiforgery` | Token antiforgery gắn với danh tính; đăng nhập xong token cũ (cấp lúc ẩn danh) hết hợp lệ, buộc frontend lấy lại ở mọi lần đổi trạng thái. Double-submit + `SameSite=Lax` + danh sách Origin tùy chọn (`Auth:AllowedOrigins`) đủ cho cookie xác thực đã `HttpOnly`. Hợp đồng với frontend (cookie + header) giữ nguyên |
+| **Token email (xác minh, đặt lại mật khẩu) tự viết trên Data Protection**, không dùng token provider của Identity | Provider của Identity đọc đồng hồ hệ thống nên không kiểm thử được hết hạn bằng `TimeProvider` (ID-T07). Token đặt lại mật khẩu gắn với SecurityStamp nên chỉ dùng được một lần |
+| Làm mới trong ân hạn 10 giây **chỉ cấp access token mới**, không xoay tiếp | Đúng §14.5 bước 4a: tab song song nhận cookie refresh từ request thắng cuộc (ID-T28) |
+| Ngưỡng `auth_time` ≤ 12 giờ của Admin trùng hạn tuyệt đối phiên Admin (12 giờ) | Lớp bảo vệ thứ hai, chỉ có tác dụng riêng khi đổi cấu hình `Auth:AdminReauthHours` nhỏ hơn hạn phiên. Test ID-T38 giả lập `auth_time` cũ trực tiếp trong DB |
+| Frontend chỉ gọi `/auth/refresh` khi có "gợi ý đã đăng nhập" trong `localStorage` | Cookie `HttpOnly` không đọc được từ JS; không có gợi ý thì khách mỗi trang gọi refresh vô ích và chạm giới hạn tốc độ |
+| Trang đọc `searchParams` phải bọc trong `<Suspense>` | Next.js 16 bật Cache Components: `next dev` không báo lỗi nhưng `next build` sẽ lỗi. **Luôn chạy `npm run build` trước khi tuyên bố xong frontend** |
+| Mật khẩu: thông báo lỗi tiếng Việt qua `AduoPasswordValidator`, tắt quy tắc mặc định của Identity | Quy tắc mặc định trả thông báo tiếng Anh |
 
 ### Điều chỉnh so với thiết kế khi code Foundation
 | Thay đổi | Lý do |
@@ -149,7 +162,7 @@ Tài liệu: [CR-003](../change-requests/CR-003-personalization-from-brottin.md)
 - Hạn tuyệt đối của phiên (90 ngày khi "Ghi nhớ", 7 ngày khi không). **Admin:** tối đa 12 giờ, không "Ghi nhớ".
 - "Thiết bị đăng nhập", "Đăng xuất mọi thiết bị", nhật ký sự kiện bảo mật (IP rút gọn, giữ 180 ngày).
 - Khóa ký trong biến môi trường, có `kid`, có quy trình xoay khóa.
-- Vẫn chống CSRF (antiforgery) vì token nằm trong cookie.
+- Vẫn chống CSRF vì token nằm trong cookie (đã cài bằng double-submit cookie, xem mục 7 "Điều chỉnh khi code Identity").
 
 **Đánh đổi đã chấp nhận:** Identity tăng từ 6–8 lên **11–15 ngày công**, tổng MVP khoảng **93–126**. Phức tạp hơn cookie session, bù lại bằng bộ test dày (ID-T24..45). Khi chạy nhiều instance, bộ đệm thu hồi phải chuyển sang Redis (ghi quyết định lúc đó).
 

@@ -2,6 +2,8 @@
 
 > **[CẬP NHẬT – AD-09, 2026-11-22]** Phần xác thực của module này dùng **JWT access token + refresh token xoay vòng** (không dùng cookie đăng nhập của Identity). Các câu nhắc tới "cookie phiên" ở §2–§8 đã được vá. **Thiết kế đầy đủ nằm ở §14**, phần nào mâu thuẫn thì §14 thắng. Ước tính module tăng từ 6–8 lên **11–15 ngày công**.
 
+> **[TRẠNG THÁI TRIỂN KHAI – 2026-11-23]** Backend + frontend cốt lõi đã chạy và kiểm chứng (ID-T01..11, 15..20, 24..39, 41..44 pass trên PostgreSQL thật). **Chưa làm:** Google login (ID-T12..14, T45, cần OAuth Client ID/Secret của chủ dự án), ID-T21..23 (khách chơi thử, onboarding phút học), ID-T40 (xoay khóa ký). ID-T17 hiện kiểm tra qua danh sách quyền ở `/me` vì endpoint `assessment.take` chưa có. Điều chỉnh so với thiết kế (CSRF double-submit, token email tự viết…): [decision log §7](../../phase-1/08-decision-log.md).
+
 ## 1. Mục tiêu & phạm vi
 **Mục tiêu:** người dùng tạo được tài khoản và đăng nhập **an toàn**, khai báo mục đích học. Admin có quyền quản trị. Mọi module khác dựa vào Identity để biết "ai đang gọi" và "người đó được làm gì".
 

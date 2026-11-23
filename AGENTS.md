@@ -90,7 +90,8 @@ docker compose -f deploy/compose.dev.yml up -d                       # PostgreSQ
 cd backend
 dotnet tool restore
 dotnet ef database update --project src/Aduo.Core --startup-project src/Aduo.Api
-dotnet run --project src/Aduo.Api --launch-profile http            # API http://localhost:5000
+dotnet run --project src/Aduo.Api --launch-profile http            # API http://localhost:5000 (đặt ASPNETCORE_ENVIRONMENT=Development để có khóa JWT dev)
+dotnet run --project src/Aduo.Cli -- create-admin --email <email>   # tạo Admin đầu tiên (mật khẩu nhập ẩn hoặc biến ADUO_ADMIN_PASSWORD)
 dotnet test                                                         # toàn bộ (integration cần Docker)
 dotnet test tests/Aduo.Core.Tests                                   # unit, không cần Docker
 
@@ -114,7 +115,7 @@ Cổng: API **5000**, web **3000**, PostgreSQL **5432**. Bash trong môi trườ
 - **Phase 4 (code MVP):**
   - ✅ **Bước 1 – Foundation:** xong, đã xác minh (51 test pass, migration chạy trên Postgres thật, web ↔ API ↔ DB thông suốt).
   - ✅ **CR-002 đã chốt (phương án 2)** ngày 2026-11-22. Thêm module **8 – Engagement** vào MVP. Còn một câu chưa trả lời riêng: **Q-CR2-03** (hướng hình ảnh "Bàn học": tạm theo đề xuất gradient + vector tự thiết kế). Hỏi lại trước khi làm giao diện Bàn học.
-  - ⏭️ **Bước 2 – Identity:** chưa bắt đầu. Cần chủ dự án tạo Google OAuth Client ID/Secret.
+  - 🔶 **Bước 2 – Identity:** backend + frontend cốt lõi xong và đã xác minh (87 test pass, thử tay trên trình duyệt, lint/typecheck/build sạch), **chưa commit**. Còn thiếu: **đăng nhập Google (cần chủ dự án tạo Google OAuth Client ID/Secret)**, onboarding "phút học mỗi ngày", test xoay khóa ký, thử trên điện thoại thật. Chi tiết và các điều chỉnh so với thiết kế: decision log §7.
 - **Hướng trải nghiệm:** chủ dự án muốn giao diện và cảm giác học gần với **Brottin** ("Bàn học" một cửa, streak, nhiệm vụ ngày, vào học ngay không cần đăng nhập), rồi mở rộng. Điểm khác biệt của ADUO: **thông tin Ausbildung/Recognition có nguồn chính thức và ngày rà soát, minh bạch nguồn/giấy phép nội dung, không môi giới**.
 - **Thứ tự triển khai đã chốt (sau CR-002):** Foundation → Identity → ContentOps 2a (lõi) → Lexicon → Catalog → Assessment 5a → Progress → **Engagement** → Assessment 5b → InfoHub → ContentOps 2b. Tổng ước tính code MVP khoảng 93–126 ngày công (sau CR-002, CR-003 và AD-09). Có điểm kiểm tra sau Identity + ContentOps 2a + Lexicon để đo tốc độ thực. (Khác Phase 2: ContentOps và Lexicon trước Catalog vì bài học tham chiếu từ vựng và mọi nội dung cần Source/License.)
 - Quy trình mỗi module: rà yêu cầu → migration → domain + unit test → API + integration test → UI → test thủ công trên mobile → cập nhật tài liệu. Module **chỉ xong** khi CI xanh và mọi tiêu chí chấp nhận liên quan ở `docs/phase-2/04-user-stories.md` đạt.
@@ -128,6 +129,9 @@ Cổng: API **5000**, web **3000**, PostgreSQL **5432**. Bash trong môi trườ
 - **OpenAPI:** endpoint chỉ xuất hiện trong OpenAPI nếu viết bằng minimal API (đó là lý do `/api/health` không dùng `MapHealthChecks`). Thêm API mới xong thì chạy `npm run gen:api`.
 - **Integration test:** nhóm `NoDbApiFactory` không cần Docker (nhanh). Nhóm `ApiFactory` dùng Testcontainers và cần Docker Desktop đang chạy.
 - **Serilog:** sink cấu hình bằng code trong `Program.cs`, mức log đọc từ appsettings. Không bao giờ log mật khẩu, token, cookie, nội dung báo lỗi.
+- **Next.js 16 bật Cache Components:** `next dev` không báo lỗi nhưng `next build` thất bại nếu trang đọc `searchParams`/`cookies()` ngoài `<Suspense>`. Luôn chạy `npm run build` trước khi báo frontend xong.
+- **Identity (AD-09):** CSRF là double-submit cookie tự viết, token email tự viết trên Data Protection (xem decision log §7). Test tích hợp dùng `FakeTimeProvider` và `CapturingEmailSender` trong `ApiFactory`; `UserManager` khóa tạm vẫn dùng đồng hồ hệ thống nên test ID-T09 chỉnh `LockoutEnd` trực tiếp trong DB.
+- **Khóa JWT:** `appsettings.Development.json` / `appsettings.Testing.json` chứa khóa chỉ dành cho máy local và test. Staging/production phải đặt `Jwt__Keys__0__KeyId`, `Jwt__Keys__0__Secret` (≥ 32 ký tự) và `Auth__UseSecureCookies=true`, `Auth__UseCookiePrefixes=true`; thiếu khóa thì API không khởi động.
 - **Dữ liệu Wiktionary** (module Lexicon) có cấu trúc chưa được kiểm tra trên dữ liệu thật. Bước đầu tiên của Lexicon là đọc thử khoảng 50 entry và ghi lại cấu trúc, rồi mới viết mapper.
 
 ## 9. Pháp lý & nội dung (không được vi phạm)

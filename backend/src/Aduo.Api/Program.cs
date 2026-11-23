@@ -2,6 +2,12 @@ using System.Text.Json.Serialization;
 using Aduo.Api.Middleware;
 using Aduo.Api.Setup;
 using Aduo.Core;
+using Aduo.Core.Modules.Identity;
+using Aduo.Core.Modules.Identity.Auth;
+using Aduo.Core.Modules.Identity.Features;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -36,6 +42,33 @@ builder.Host.UseSerilog((context, services, config) =>
 
 // ── Services ───────────────────────────────────────────────────────────────────────
 builder.Services.AddAduoCore(builder.Configuration);
+builder.Services.AddIdentityModule(builder.Configuration);
+
+// ── Đăng nhập Google: chỉ bật khi đã cấu hình ClientId/ClientSecret (user-secrets ở dev, biến môi trường ở production) ──
+var googleSection = builder.Configuration.GetSection("Authentication:Google");
+if (!string.IsNullOrEmpty(googleSection["ClientId"]) && !string.IsNullOrEmpty(googleSection["ClientSecret"]))
+{
+    var secureCookies = builder.Configuration.GetValue("Auth:UseSecureCookies", true);
+    builder.Services.AddAuthentication().AddGoogle(o =>
+    {
+        o.ClientId = googleSection["ClientId"]!;
+        o.ClientSecret = googleSection["ClientSecret"]!;
+        o.SignInScheme = IdentityModule.ExternalScheme;
+        o.CallbackPath = "/api/v1/auth/external/google/callback"; // phải khớp "Authorized redirect URI" trên Google Cloud
+        o.SaveTokens = false; // không lưu token của Google (ID-T45)
+        o.ClaimActions.MapJsonKey("email_verified", "email_verified", ClaimValueTypes.Boolean);
+        // Cookie "correlation" mặc định SameSite=None (cần HTTPS). Callback của Google là GET điều hướng cấp cao nên Lax là đủ.
+        o.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        o.CorrelationCookie.SecurePolicy = secureCookies ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
+        o.Events.OnRemoteFailure = ctx =>
+        {
+            // Người dùng bấm Hủy ở Google, hoặc state không hợp lệ: quay về trang đăng nhập, không lộ chi tiết.
+            ctx.Response.Redirect("/dang-nhap?loi=google_failed");
+            ctx.HandleResponse();
+            return Task.CompletedTask;
+        };
+    });
+}
 builder.Services.AddAduoBackgroundJobs();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -52,7 +85,7 @@ builder.Services.AddOpenApi("v1");
 // Ở production, Caddy đứng trước API: tin header X-Forwarded-* để biết IP thật và scheme https.
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
     options.KnownIPNetworks.Clear(); // Caddy nằm trong mạng Docker nội bộ, IP không cố định
     options.KnownProxies.Clear();
 });
@@ -67,10 +100,14 @@ app.UseStatusCodePages();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseRateLimiter();
-// UseAuthentication / UseAuthorization / UseAntiforgery: thêm ở module Identity.
+// Thứ tự: xác thực (đọc JWT từ cookie) → CSRF → phân quyền.
+app.UseAuthentication();
+app.UseMiddleware<CsrfMiddleware>();
+app.UseAuthorization();
 
 // ── Endpoints ──────────────────────────────────────────────────────────────────────
 app.MapAduoHealthChecks();
+app.MapIdentityEndpoints();
 
 if (!app.Environment.IsProduction())
 {

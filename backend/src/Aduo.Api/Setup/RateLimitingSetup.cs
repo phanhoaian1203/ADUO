@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
 using Aduo.Core.Common.Results;
+using Aduo.Core.Modules.Identity.Features;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Aduo.Api.Setup;
@@ -32,6 +33,11 @@ public static class RateLimitingSetup
                         QueueLimit = 0,
                     }));
 
+            // Policy riêng của Identity, tính theo IP (docs 01-identity BR-AUTH-06, phase-3/01 §8).
+            AddIpPolicy(options, IdentityRateLimits.Login, configuration.GetValue("RateLimiting:LoginPerMinute", 10), TimeSpan.FromMinutes(1));
+            AddIpPolicy(options, IdentityRateLimits.Register, configuration.GetValue("RateLimiting:RegisterPerHour", 5), TimeSpan.FromHours(1));
+            AddIpPolicy(options, IdentityRateLimits.ForgotPassword, configuration.GetValue("RateLimiting:ForgotPerHour", 10), TimeSpan.FromHours(1));
+
             options.OnRejected = async (context, ct) =>
             {
                 if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
@@ -50,6 +56,11 @@ public static class RateLimitingSetup
 
         return services;
     }
+
+    private static void AddIpPolicy(RateLimiterOptions options, string name, int permits, TimeSpan window)
+        => options.AddPolicy(name, ctx => RateLimitPartition.GetFixedWindowLimiter(
+            name + ":" + (ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = permits, Window = window, QueueLimit = 0 }));
 
     /// <summary>Đã đăng nhập thì theo userId, chưa đăng nhập thì theo IP.</summary>
     internal static string PartitionKey(HttpContext ctx)
